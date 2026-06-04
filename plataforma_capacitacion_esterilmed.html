@@ -1,0 +1,480 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.app{max-width:680px;margin:0 auto;padding:1rem 0}
+.screen{display:none}
+.screen.active{display:block}
+.header{background:#4472C4;color:#fff;padding:1rem 1.25rem;border-radius:var(--border-radius-lg);margin-bottom:1rem;display:flex;align-items:center;gap:12px}
+.header-logo{font-size:20px;font-weight:500}
+.header-sub{font-size:13px;opacity:.85}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:.75rem}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-primary);font-size:14px;cursor:pointer;transition:background .15s}
+.btn:hover{background:var(--color-background-secondary)}
+.btn-primary{background:#4472C4;color:#fff;border-color:#4472C4}
+.btn-primary:hover{background:#3560b0}
+.btn-sm{padding:5px 12px;font-size:13px}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:var(--border-radius-md)}
+.badge-blue{background:#E6F1FB;color:#0C447C}
+.badge-green{background:#EAF3DE;color:#27500A}
+.badge-amber{background:#FAEEDA;color:#633806}
+.badge-gray{background:#F1EFE8;color:#444441}
+.progress-bar{height:6px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden;margin:8px 0}
+.progress-fill{height:100%;background:#4472C4;border-radius:3px;transition:width .3s}
+.module-list{display:flex;flex-direction:column;gap:.5rem}
+.module-item{display:flex;align-items:center;gap:12px;padding:.75rem 1rem;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);cursor:pointer;transition:background .15s}
+.module-item:hover{background:var(--color-background-secondary)}
+.module-icon{width:36px;height:36px;border-radius:var(--border-radius-md);background:#E6F1FB;display:flex;align-items:center;justify-content:center;color:#185FA5;font-size:18px;flex-shrink:0}
+.module-info{flex:1}
+.module-title{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.module-sub{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+.slide{display:none}
+.slide.active{display:block}
+.slide-content{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:1.5rem;margin-bottom:1rem;min-height:180px}
+.slide-title{font-size:16px;font-weight:500;color:var(--color-text-primary);margin-bottom:.75rem}
+.slide-text{font-size:14px;color:var(--color-text-secondary);line-height:1.7}
+.slide-list{list-style:none;margin-top:.75rem}
+.slide-list li{font-size:14px;color:var(--color-text-secondary);padding:4px 0;padding-left:20px;position:relative;line-height:1.6}
+.slide-list li:before{content:"›";position:absolute;left:0;color:#4472C4;font-weight:500}
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:.75rem}
+.question-block{margin-bottom:1rem}
+.question-text{font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:.5rem}
+.option-btn{display:block;width:100%;text-align:left;padding:.6rem .9rem;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-primary);font-size:13px;cursor:pointer;margin-bottom:.4rem;transition:all .15s}
+.option-btn:hover{background:var(--color-background-secondary)}
+.option-btn.correct{background:#EAF3DE;border-color:#639922;color:#27500A}
+.option-btn.wrong{background:#FCEBEB;border-color:#A32D2D;color:#501313}
+.option-btn.selected{background:#E6F1FB;border-color:#4472C4;color:#0C447C}
+.input-field{width:100%;padding:8px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-primary);font-size:14px;margin-bottom:.75rem}
+.cert{background:var(--color-background-primary);border:2px solid #4472C4;border-radius:var(--border-radius-lg);padding:2rem;text-align:center}
+.cert-logo{font-size:28px;font-weight:500;color:#4472C4;margin-bottom:.25rem}
+.cert-sub{font-size:12px;color:var(--color-text-secondary);margin-bottom:1.5rem}
+.cert-title{font-size:14px;color:var(--color-text-secondary);margin-bottom:.5rem}
+.cert-name{font-size:22px;font-weight:500;color:var(--color-text-primary);margin-bottom:1rem}
+.cert-module{font-size:14px;color:#185FA5;background:#E6F1FB;padding:6px 16px;border-radius:var(--border-radius-md);display:inline-block;margin-bottom:1rem}
+.cert-score{font-size:32px;font-weight:500;color:#4472C4;margin-bottom:.25rem}
+.cert-score-label{font-size:13px;color:var(--color-text-secondary);margin-bottom:1.5rem}
+.cert-line{border:0.5px solid var(--color-border-tertiary);margin:1rem 0}
+.cert-date{font-size:12px;color:var(--color-text-secondary)}
+.registry-table{width:100%;border-collapse:collapse;font-size:13px}
+.registry-table th{text-align:left;padding:6px 8px;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary);font-weight:400}
+.registry-table td{padding:8px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)}
+.registry-table tr:last-child td{border-bottom:none}
+.video-placeholder{background:var(--color-background-secondary);border-radius:var(--border-radius-md);height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;margin-bottom:1rem;border:0.5px dashed var(--color-border-secondary)}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1rem}
+.stat{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.75rem;text-align:center}
+.stat-num{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.stat-label{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+</style>
+
+<div class="app">
+<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden">Plataforma de capacitación EsterilMed — módulos de esterilización y normativa MINSAL</h2>
+
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <div class="header-logo">EsterilMed SpA</div>
+    <div class="header-sub">Plataforma de Capacitación Interna</div>
+  </div>
+</div>
+
+<!-- PANTALLA: LOGIN -->
+<div class="screen active" id="screen-login">
+  <div class="card" style="max-width:400px;margin:2rem auto">
+    <p style="font-size:16px;font-weight:500;margin-bottom:1rem;color:var(--color-text-primary)">Ingresar a capacitación</p>
+    <label style="font-size:13px;color:var(--color-text-secondary);display:block;margin-bottom:4px">Nombre completo</label>
+    <input class="input-field" id="login-name" placeholder="Ej: María González" />
+    <label style="font-size:13px;color:var(--color-text-secondary);display:block;margin-bottom:4px">Área de trabajo</label>
+    <select class="input-field" id="login-area">
+      <option value="">Seleccionar área...</option>
+      <option>Recepción y Lavado</option>
+      <option>Preparación y Empaque</option>
+      <option>Esterilización</option>
+      <option>Entrega y Distribución</option>
+      <option>Supervisión</option>
+    </select>
+    <label style="font-size:13px;color:var(--color-text-secondary);display:block;margin-bottom:4px">Turno</label>
+    <select class="input-field" id="login-turno">
+      <option value="">Seleccionar turno...</option>
+      <option>Día</option>
+      <option>Noche</option>
+      <option>Part Time</option>
+    </select>
+    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="doLogin()">
+      <i class="ti ti-login" aria-hidden="true"></i> Comenzar
+    </button>
+  </div>
+</div>
+
+<!-- PANTALLA: MÓDULOS -->
+<div class="screen" id="screen-modules">
+  <div class="card">
+    <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:.25rem">Bienvenida/o,</p>
+    <p style="font-size:16px;font-weight:500;color:var(--color-text-primary)" id="welcome-name">—</p>
+    <p style="font-size:13px;color:var(--color-text-secondary);margin-top:2px" id="welcome-area">—</p>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat"><div class="stat-num" id="stat-completados">0</div><div class="stat-label">Completados</div></div>
+    <div class="stat"><div class="stat-num">4</div><div class="stat-label">Módulos totales</div></div>
+    <div class="stat"><div class="stat-num" id="stat-promedio">—</div><div class="stat-label">Nota promedio</div></div>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+    <p style="font-size:14px;font-weight:500;color:var(--color-text-primary)">Módulos disponibles</p>
+    <button class="btn btn-sm" onclick="goScreen('screen-registry')"><i class="ti ti-table" aria-hidden="true"></i> Registro</button>
+  </div>
+
+  <div class="module-list" id="module-list"></div>
+</div>
+
+<!-- PANTALLA: LECCIÓN -->
+<div class="screen" id="screen-lesson">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem">
+    <button class="btn btn-sm" onclick="goScreen('screen-modules')"><i class="ti ti-arrow-left" aria-hidden="true"></i> Volver</button>
+    <p style="font-size:13px;color:var(--color-text-secondary)" id="lesson-breadcrumb">Módulo</p>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+      <p style="font-size:15px;font-weight:500;color:var(--color-text-primary)" id="lesson-title">—</p>
+      <span class="badge badge-blue" id="slide-counter">1 / 1</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="lesson-progress" style="width:0%"></div></div>
+    <div id="slides-container"></div>
+    <div class="nav-row">
+      <button class="btn btn-sm" id="btn-prev" onclick="prevSlide()"><i class="ti ti-arrow-left" aria-hidden="true"></i> Anterior</button>
+      <button class="btn btn-primary btn-sm" id="btn-next" onclick="nextSlide()">Siguiente <i class="ti ti-arrow-right" aria-hidden="true"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- PANTALLA: EVALUACIÓN -->
+<div class="screen" id="screen-quiz">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem">
+    <button class="btn btn-sm" onclick="goScreen('screen-lesson')"><i class="ti ti-arrow-left" aria-hidden="true"></i> Volver a lección</button>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+      <p style="font-size:15px;font-weight:500;color:var(--color-text-primary)">Evaluación</p>
+      <span class="badge badge-amber" id="quiz-module-badge">—</span>
+    </div>
+    <div id="quiz-container"></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:.5rem" id="btn-submit-quiz" onclick="submitQuiz()">
+      <i class="ti ti-send" aria-hidden="true"></i> Enviar respuestas
+    </button>
+  </div>
+</div>
+
+<!-- PANTALLA: CERTIFICADO -->
+<div class="screen" id="screen-cert">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem">
+    <button class="btn btn-sm" onclick="goScreen('screen-modules')"><i class="ti ti-arrow-left" aria-hidden="true"></i> Volver a módulos</button>
+  </div>
+  <div class="cert">
+    <div class="cert-logo">EsterilMed SpA</div>
+    <div class="cert-sub">Plataforma de Capacitación Interna</div>
+    <div class="cert-title">Certifica que</div>
+    <div class="cert-name" id="cert-name">—</div>
+    <div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:.75rem">ha completado exitosamente el módulo</div>
+    <div class="cert-module" id="cert-module">—</div>
+    <br><br>
+    <div class="cert-score" id="cert-score">—%</div>
+    <div class="cert-score-label">Puntaje obtenido</div>
+    <div class="cert-line"></div>
+    <div class="cert-date" id="cert-date">—</div>
+    <div style="margin-top:1.5rem;display:flex;gap:.5rem;justify-content:center">
+      <button class="btn btn-primary" onclick="printCert()"><i class="ti ti-printer" aria-hidden="true"></i> Imprimir constancia</button>
+      <button class="btn" onclick="goScreen('screen-modules')"><i class="ti ti-home" aria-hidden="true"></i> Inicio</button>
+    </div>
+  </div>
+</div>
+
+<!-- PANTALLA: REGISTRO -->
+<div class="screen" id="screen-registry">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem">
+    <button class="btn btn-sm" onclick="goScreen('screen-modules')"><i class="ti ti-arrow-left" aria-hidden="true"></i> Volver</button>
+    <p style="font-size:14px;font-weight:500;color:var(--color-text-primary)">Registro de capacitaciones completadas</p>
+  </div>
+  <div class="card" style="overflow-x:auto">
+    <div id="registry-content">
+      <p style="font-size:13px;color:var(--color-text-secondary);text-align:center;padding:2rem 0">No hay registros aún.</p>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+const MODULES = [
+  {
+    id:'m1',
+    title:'Fundamentos de Esterilización',
+    badge:'blue',
+    icon:'ti-virus',
+    desc:'Conceptos básicos del proceso de esterilización',
+    slides:[
+      {title:'¿Qué es la esterilización?',type:'text',content:'La esterilización es el proceso por el cual se elimina o destruye toda forma de vida microbiana, incluyendo bacterias, hongos, virus y esporas.',list:['Objetivo: material 100% libre de microorganismos','Diferente a desinfección y limpieza','Requisito obligatorio para material crítico según clasificación de Spaulding']},
+      {title:'Clasificación de Spaulding',type:'text',content:'Define el nivel de procesamiento requerido según el uso del instrumental.',list:['Crítico: penetra tejido estéril → esterilización obligatoria','Semicrítico: contacto con mucosas → desinfección alto nivel','No crítico: contacto con piel íntegra → limpieza y desinfección de bajo nivel']},
+      {title:'Video: Ciclo de esterilización',type:'video',content:'Ciclo completo de esterilización en autoclave — proceso paso a paso'},
+      {title:'Etapas del procesamiento',type:'text',content:'El procesamiento de instrumental sigue un flujo unidireccional que garantiza la calidad del proceso.',list:['1. Recepción y clasificación','2. Lavado y descontaminación','3. Inspección y preparación','4. Empaque y sellado','5. Esterilización','6. Almacenamiento y distribución']}
+    ],
+    quiz:[
+      {q:'¿Qué nivel de procesamiento requiere el instrumental que penetra tejido estéril?',opts:['Limpieza básica','Desinfección de bajo nivel','Esterilización','Desinfección de nivel intermedio'],a:2},
+      {q:'¿Cuántos niveles tiene la clasificación de Spaulding?',opts:['2','3','4','5'],a:1},
+      {q:'¿Cuál es la secuencia correcta del procesamiento de instrumental?',opts:['Empaque → Lavado → Esterilización','Recepción → Lavado → Empaque → Esterilización','Esterilización → Lavado → Empaque → Entrega','Lavado → Recepción → Empaque → Almacenamiento'],a:1},
+      {q:'La esterilización elimina:',opts:['Solo bacterias','Solo bacterias y virus','Toda forma de vida microbiana, incluyendo esporas','Solo microorganismos patógenos'],a:2}
+    ]
+  },
+  {
+    id:'m2',
+    title:'Métodos de Esterilización',
+    badge:'blue',
+    icon:'ti-temperature',
+    desc:'Calor húmedo, óxido de etileno y otros métodos',
+    slides:[
+      {title:'Calor húmedo — Autoclave',type:'text',content:'Es el método de elección para la mayoría del instrumental. Utiliza vapor saturado a presión para destruir microorganismos.',list:['Temperatura: 121°C (30 min) o 134°C (3-4 min)','Parámetros críticos: temperatura, tiempo y presión','Indicado para material resistente al calor y la humedad','Ventaja: seguro, económico, sin residuos tóxicos']},
+      {title:'Video: Carga y operación del autoclave',type:'video',content:'Procedimiento correcto de carga del autoclave y control de ciclo'},
+      {title:'Óxido de Etileno (ETO)',type:'text',content:'Método para material termosensible. Gas tóxico que actúa alquilando proteínas y ADN microbiano.',list:['Temperatura: 37–55°C','Requiere aireación obligatoria post-ciclo (12–16 hrs)','Indicado para material plástico, electrónico, óptico','Riesgo: tóxico, carcinógeno — requiere manejo especial']},
+      {title:'Otros métodos',type:'text',content:'Existen métodos alternativos para casos específicos.',list:['Plasma de peróxido de hidrógeno: rápido, sin residuos tóxicos','Calor seco (Pupinel): 160–180°C, para material sin humedad','Radiación gamma: uso industrial, no hospitalario','Filtración: solo líquidos termosensibles']}
+    ],
+    quiz:[
+      {q:'¿A qué temperatura trabaja el autoclave en ciclo flash (134°C)?',opts:['10 minutos','3-4 minutos','20 minutos','1 hora'],a:1},
+      {q:'¿Para qué tipo de material se indica el óxido de etileno?',opts:['Solo metales','Material termosensible (plásticos, electrónico)','Material de vidrio','Instrumental de acero inoxidable'],a:1},
+      {q:'¿Cuánto tiempo mínimo requiere la aireación post-ETO?',opts:['2-4 horas','6-8 horas','12-16 horas','30 minutos'],a:2},
+      {q:'Los parámetros críticos del autoclave son:',opts:['Solo temperatura','Temperatura, tiempo y presión','Humedad y velocidad','Temperatura y color del indicador'],a:1}
+    ]
+  },
+  {
+    id:'m3',
+    title:'Norma N°199 MINSAL',
+    badge:'green',
+    icon:'ti-file-certificate',
+    desc:'Requisitos legales y técnicos de la normativa vigente',
+    slides:[
+      {title:'¿Qué es la Norma N°199?',type:'text',content:'La Norma Técnica N°199 del MINSAL establece los requisitos mínimos para el procesamiento de dispositivos médicos en Chile.',list:['Regula toda la cadena de procesamiento de instrumental','De cumplimiento obligatorio para establecimientos de salud','Base legal: Decreto Exento N°199, MINSAL','Aplica a prestadores propios y externos (como EsterilMed)']},
+      {title:'Video: Aspectos clave Norma N°199',type:'video',content:'Resumen de requisitos críticos y fiscalización MINSAL'},
+      {title:'Requisitos de infraestructura',type:'text',content:'La norma establece condiciones físicas mínimas para las unidades de procesamiento.',list:['Flujo unidireccional: zona sucia → limpia → estéril','Diferenciales de presión: zona limpia con presión positiva','Temperatura: 18–22°C en zona limpia','Filtración de aire: HEPA en zonas críticas','Vestuarios diferenciados por zona']},
+      {title:'Controles y registros obligatorios',type:'text',content:'Toda carga esterilizada debe contar con controles que garanticen la efectividad del proceso.',list:['Indicadores físicos: gráficos de temperatura y presión','Indicadores químicos: tipo 1 (externo) y tipo 5/6 (internos)','Indicadores biológicos: semanal o por carga (ETO)','Trazabilidad: etiqueta con N° lote, fecha venc., operador','Registro en libro o sistema digital de cada carga']}
+    ],
+    quiz:[
+      {q:'¿Qué establece la Norma Técnica N°199 del MINSAL?',opts:['Solo el diseño arquitectónico','Los requisitos mínimos para el procesamiento de dispositivos médicos','El listado de equipos autorizados','Las sanciones por incumplimiento'],a:1},
+      {q:'¿Cómo debe ser el flujo de trabajo según la norma?',opts:['Bidireccional','Circular','Unidireccional (sucio a limpio)','Libre, según necesidad operativa'],a:2},
+      {q:'¿Con qué frecuencia mínima se deben usar indicadores biológicos en autoclave?',opts:['Diario','Semanal','Mensual','Solo cuando hay falla'],a:1},
+      {q:'¿Qué información debe contener obligatoriamente la etiqueta de trazabilidad?',opts:['Solo fecha de esterilización','N° lote, fecha vencimiento e identificación del operador','Solo el nombre del cliente','Solo el método de esterilización'],a:1}
+    ]
+  },
+  {
+    id:'m4',
+    title:'Controles de Calidad en Esterilización',
+    badge:'amber',
+    icon:'ti-checklist',
+    desc:'Indicadores, trazabilidad y gestión de no conformidades',
+    slides:[
+      {title:'Tipos de indicadores',type:'text',content:'Los indicadores son herramientas que permiten verificar que el proceso de esterilización fue efectivo.',list:['Clase 1 (externo): solo indica exposición al proceso','Clase 5 (integrador): evalúa temperatura, tiempo y vapor','Clase 6 (emulador): diseñado para ciclo específico','Indicador biológico (IB): único que evalúa muerte microbiana real']},
+      {title:'Video: Lectura e interpretación de indicadores',type:'video',content:'Cómo leer correctamente los indicadores químicos y biológicos'},
+      {title:'Trazabilidad del instrumental',type:'text',content:'La trazabilidad permite rastrear cada instrumental desde el cliente hasta la entrega del material estéril.',list:['Registro de recepción: cantidad, tipo, cliente, hora','Registro de carga: N° autoclave, ciclo, parámetros','Etiqueta de lote en cada paquete','Registro de distribución: a quién, cuándo, qué','Tiempo de retención de registros: mínimo 5 años']},
+      {title:'Gestión de no conformidades',type:'text',content:'Cuando se detecta una falla en el proceso, se debe actuar de forma inmediata y documentada.',list:['Identificar el lote afectado y bloquearlo','Notificar al cliente y recuperar material si fue distribuido','Investigar causa raíz','Implementar acción correctiva','Registrar en sistema de no conformidades','Verificar efectividad de la acción correctiva']}
+    ],
+    quiz:[
+      {q:'¿Cuál es el único indicador que evalúa la muerte microbiana real?',opts:['Indicador clase 1','Indicador clase 5','Indicador clase 6','Indicador biológico'],a:3},
+      {q:'¿Cuánto tiempo mínimo deben conservarse los registros de esterilización?',opts:['1 año','2 años','5 años','10 años'],a:2},
+      {q:'Ante una no conformidad, ¿cuál es el primer paso?',opts:['Notificar a MINSAL','Identificar y bloquear el lote afectado','Reprocesar el material sin documentar','Registrar en 48 horas'],a:1},
+      {q:'La trazabilidad del instrumental permite:',opts:['Solo controlar el stock','Rastrear el instrumental desde recepción hasta entrega estéril','Solo identificar al operador responsable','Calcular el costo del servicio'],a:1}
+    ]
+  }
+];
+
+const STATE = {user:{name:'',area:'',turno:''},completed:{},scores:{},currentModule:null,currentSlide:0,quizAnswers:{},registry:[]};
+
+const badgeMap = {blue:'badge-blue',green:'badge-green',amber:'badge-amber',gray:'badge-gray'};
+
+function goScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
+
+function doLogin(){
+  const n=document.getElementById('login-name').value.trim();
+  const a=document.getElementById('login-area').value;
+  const t=document.getElementById('login-turno').value;
+  if(!n||!a||!t){alert('Por favor completa todos los campos.');return;}
+  STATE.user={name:n,area:a,turno:t};
+  document.getElementById('welcome-name').textContent=n;
+  document.getElementById('welcome-area').textContent=a+' — Turno '+t;
+  renderModules();
+  goScreen('screen-modules');
+}
+
+function renderModules(){
+  const list=document.getElementById('module-list');
+  list.innerHTML='';
+  MODULES.forEach((m,i)=>{
+    const done=STATE.completed[m.id];
+    const score=STATE.scores[m.id];
+    const div=document.createElement('div');
+    div.className='module-item';
+    div.innerHTML=`<div class="module-icon"><i class="ti ${m.icon}" aria-hidden="true"></i></div>
+    <div class="module-info">
+      <div class="module-title">${i+1}. ${m.title}</div>
+      <div class="module-sub">${m.desc}</div>
+      ${done?`<div style="margin-top:4px"><span class="badge badge-green"><i class="ti ti-circle-check" aria-hidden="true"></i> Completado — ${score}%</span></div>`:''}
+    </div>
+    <span class="badge ${badgeMap[m.badge]||'badge-gray'}" style="flex-shrink:0">${done?'✓':'Iniciar'}</span>`;
+    div.onclick=()=>openModule(m.id);
+    list.appendChild(div);
+  });
+  const doneCount=Object.keys(STATE.completed).length;
+  document.getElementById('stat-completados').textContent=doneCount;
+  if(doneCount>0){
+    const avg=Math.round(Object.values(STATE.scores).reduce((a,b)=>a+b,0)/doneCount);
+    document.getElementById('stat-promedio').textContent=avg+'%';
+  }
+}
+
+function openModule(mid){
+  const m=MODULES.find(x=>x.id===mid);
+  STATE.currentModule=mid;
+  STATE.currentSlide=0;
+  document.getElementById('lesson-title').textContent=m.title;
+  document.getElementById('lesson-breadcrumb').textContent=m.title;
+  renderSlides(m);
+  goScreen('screen-lesson');
+}
+
+function renderSlides(m){
+  const container=document.getElementById('slides-container');
+  container.innerHTML='';
+  m.slides.forEach((s,i)=>{
+    const div=document.createElement('div');
+    div.className='slide'+(i===0?' active':'');
+    div.id='slide-'+i;
+    if(s.type==='video'){
+      div.innerHTML=`<div class="slide-content">
+        <div class="slide-title">${s.title}</div>
+        <div class="video-placeholder">
+          <i class="ti ti-player-play" style="font-size:32px;color:#4472C4" aria-hidden="true"></i>
+          <span style="font-size:13px;color:var(--color-text-secondary);text-align:center;padding:0 1rem">${s.content}</span>
+          <span class="badge badge-blue">Video educativo</span>
+        </div>
+        <p class="slide-text" style="font-size:12px;color:var(--color-text-secondary)"><i class="ti ti-info-circle" aria-hidden="true"></i> Aquí se integra el video educativo correspondiente a este módulo.</p>
+      </div>`;
+    } else {
+      div.innerHTML=`<div class="slide-content">
+        <div class="slide-title">${s.title}</div>
+        <div class="slide-text">${s.content}</div>
+        ${s.list?`<ul class="slide-list">${s.list.map(l=>`<li>${l}</li>`).join('')}</ul>`:''}
+      </div>`;
+    }
+    container.appendChild(div);
+  });
+  updateSlideNav(m);
+}
+
+function updateSlideNav(m){
+  const total=m.slides.length;
+  const cur=STATE.currentSlide;
+  document.getElementById('slide-counter').textContent=(cur+1)+' / '+total;
+  const pct=Math.round(((cur+1)/total)*100);
+  document.getElementById('lesson-progress').style.width=pct+'%';
+  document.getElementById('btn-prev').style.opacity=cur===0?'0.3':'1';
+  document.getElementById('btn-prev').disabled=cur===0;
+  const btnNext=document.getElementById('btn-next');
+  if(cur===total-1){btnNext.innerHTML='Ir a evaluación <i class="ti ti-arrow-right" aria-hidden="true"></i>';btnNext.className='btn btn-primary btn-sm';}
+  else{btnNext.innerHTML='Siguiente <i class="ti ti-arrow-right" aria-hidden="true"></i>';btnNext.className='btn btn-primary btn-sm';}
+}
+
+function prevSlide(){
+  if(STATE.currentSlide===0)return;
+  document.getElementById('slide-'+STATE.currentSlide).classList.remove('active');
+  STATE.currentSlide--;
+  document.getElementById('slide-'+STATE.currentSlide).classList.add('active');
+  const m=MODULES.find(x=>x.id===STATE.currentModule);
+  updateSlideNav(m);
+}
+
+function nextSlide(){
+  const m=MODULES.find(x=>x.id===STATE.currentModule);
+  if(STATE.currentSlide===m.slides.length-1){openQuiz(m);return;}
+  document.getElementById('slide-'+STATE.currentSlide).classList.remove('active');
+  STATE.currentSlide++;
+  document.getElementById('slide-'+STATE.currentSlide).classList.add('active');
+  updateSlideNav(m);
+}
+
+function openQuiz(m){
+  STATE.quizAnswers={};
+  document.getElementById('quiz-module-badge').textContent=m.title;
+  const container=document.getElementById('quiz-container');
+  container.innerHTML='';
+  m.quiz.forEach((q,qi)=>{
+    const div=document.createElement('div');
+    div.className='question-block';
+    div.innerHTML=`<div class="question-text">${qi+1}. ${q.q}</div>`+
+      q.opts.map((o,oi)=>`<button class="option-btn" id="opt-${qi}-${oi}" onclick="selectOpt(${qi},${oi})">${o}</button>`).join('');
+    container.appendChild(div);
+  });
+  document.getElementById('btn-submit-quiz').style.display='flex';
+  goScreen('screen-quiz');
+}
+
+function selectOpt(qi,oi){
+  const m=MODULES.find(x=>x.id===STATE.currentModule);
+  m.quiz[qi].opts.forEach((_,i)=>{
+    const btn=document.getElementById('opt-'+qi+'-'+i);
+    btn.className='option-btn';
+  });
+  document.getElementById('opt-'+qi+'-'+oi).className='option-btn selected';
+  STATE.quizAnswers[qi]=oi;
+}
+
+function submitQuiz(){
+  const m=MODULES.find(x=>x.id===STATE.currentModule);
+  const total=m.quiz.length;
+  let correct=0;
+  m.quiz.forEach((q,qi)=>{
+    const chosen=STATE.quizAnswers[qi];
+    if(chosen===undefined){alert('Por favor responde todas las preguntas.');return;}
+    q.opts.forEach((_,oi)=>{
+      const btn=document.getElementById('opt-'+qi+'-'+oi);
+      if(oi===q.a)btn.className='option-btn correct';
+      else if(oi===chosen&&chosen!==q.a)btn.className='option-btn wrong';
+      else btn.className='option-btn';
+    });
+    if(chosen===q.a)correct++;
+  });
+  const missing=m.quiz.findIndex((_,qi)=>STATE.quizAnswers[qi]===undefined);
+  if(missing>=0){alert('Por favor responde la pregunta '+(missing+1)+'.');return;}
+  const score=Math.round((correct/total)*100);
+  STATE.scores[m.id]=score;
+  STATE.completed[m.id]=true;
+  const now=new Date();
+  STATE.registry.push({name:STATE.user.name,area:STATE.user.area,turno:STATE.user.turno,module:m.title,score:score,date:now.toLocaleDateString('es-CL'),time:now.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'})});
+  document.getElementById('btn-submit-quiz').style.display='none';
+  setTimeout(()=>{showCert(m,score);},600);
+}
+
+function showCert(m,score){
+  document.getElementById('cert-name').textContent=STATE.user.name;
+  document.getElementById('cert-module').textContent=m.title;
+  document.getElementById('cert-score').textContent=score+'%';
+  const now=new Date();
+  document.getElementById('cert-date').textContent='Santiago, '+now.toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'})+' — Turno '+STATE.user.turno;
+  goScreen('screen-cert');
+  renderModules();
+}
+
+function printCert(){
+  const m=MODULES.find(x=>x.id===STATE.currentModule);
+  const score=STATE.scores[m.id];
+  const now=new Date();
+  const win=window.open('','_blank');
+  win.document.write(`<html><head><title>Constancia EsterilMed</title><style>body{font-family:Arial,sans-serif;display:flex;justify-content:center;padding:2rem}.cert{border:3px solid #4472C4;border-radius:12px;padding:3rem;max-width:600px;text-align:center}.logo{color:#4472C4;font-size:28px;font-weight:bold}.sub{color:#888;font-size:13px;margin-bottom:2rem}.name{font-size:24px;font-weight:bold;margin:1rem 0}.module{background:#E6F1FB;color:#185FA5;padding:8px 20px;border-radius:8px;display:inline-block;margin:1rem 0}.score{font-size:36px;font-weight:bold;color:#4472C4}.hr{border:1px solid #ddd;margin:1.5rem 0}.date{color:#888;font-size:13px}</style></head><body><div class="cert"><div class="logo">EsterilMed SpA</div><div class="sub">Plataforma de Capacitación Interna</div><p style="color:#555;font-size:14px">Certifica que</p><div class="name">${STATE.user.name}</div><p style="color:#555;font-size:14px">ha completado exitosamente el módulo</p><div class="module">${m.title}</div><br><br><div class="score">${score}%</div><p style="color:#888;font-size:13px">Puntaje obtenido</p><div class="hr"></div><div class="date">Santiago, ${now.toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'})} — Turno ${STATE.user.turno}</div></div></body></html>`);
+  win.document.close();
+  win.print();
+}
+
+function renderRegistry(){
+  const container=document.getElementById('registry-content');
+  if(STATE.registry.length===0){container.innerHTML='<p style="font-size:13px;color:var(--color-text-secondary);text-align:center;padding:2rem 0">No hay registros aún.</p>';return;}
+  container.innerHTML=`<table class="registry-table"><thead><tr><th>Nombre</th><th>Área</th><th>Módulo</th><th>Puntaje</th><th>Fecha</th><th>Hora</th></tr></thead><tbody>${STATE.registry.map(r=>`<tr><td>${r.name}</td><td style="font-size:12px">${r.area}</td><td style="font-size:12px">${r.module}</td><td><span class="badge ${r.score>=60?'badge-green':'badge-amber'}">${r.score}%</span></td><td style="font-size:12px">${r.date}</td><td style="font-size:12px">${r.time}</td></tr>`).join('')}</tbody></table>`;
+}
+
+document.getElementById('screen-registry').addEventListener('show',renderRegistry);
+const origGoScreen=goScreen;
+window.goScreen=function(id){origGoScreen(id);if(id==='screen-registry')renderRegistry();};
+</script>
