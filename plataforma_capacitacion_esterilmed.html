@@ -183,8 +183,9 @@ const MODULES=[
   {id:'m1',title:'Fundamentos de Esterilización',icon:'🔬',
    slides:[
     {type:'text',title:'¿Qué es la esterilización?',content:'La esterilización es el proceso por el cual se elimina o destruye toda forma de vida microbiana, incluyendo bacterias, hongos, virus y esporas.',list:['Objetivo: material 100% libre de microorganismos','Diferente a desinfección y limpieza','Requisito obligatorio para material crítico según clasificación de Spaulding']},
+    {type:'imagen',title:'Esterilización en un Centro de Salud',imgUrl:'https://drive.google.com/uc?export=view&id=1Z-0xSTN9E3toBGDKl02RB780GBPwvDbr',content:'Infografía resumen del proceso de esterilización'},
     {type:'text',title:'Clasificación de Spaulding',content:'Define el nivel de procesamiento requerido según el uso del instrumental.',list:['Crítico: penetra tejido estéril → esterilización obligatoria','Semicrítico: contacto con mucosas → desinfección alto nivel','No crítico: contacto con piel íntegra → limpieza y desinfección de bajo nivel']},
-    {type:'youtube',title:'Video: Ciclo de esterilización',videoId:'XdTjHX-evmU',content:'Ciclo completo de esterilización en autoclave'},
+    {type:'text',title:'Video: Ciclo de esterilización',content:'Este módulo incluye un video educativo sobre el ciclo completo de esterilización en autoclave. Consulta a tu supervisora para acceder al material audiovisual.',list:['Ingreso del material al autoclave','Verificación de parámetros: temperatura, tiempo y presión','Lectura de indicadores al finalizar el ciclo','Registro y trazabilidad de la carga']},
     {type:'text',title:'Etapas del procesamiento',content:'El procesamiento de instrumental sigue un flujo unidireccional que garantiza la calidad del proceso.',list:['1. Recepción y clasificación','2. Lavado y descontaminación','3. Inspección y preparación','4. Empaque y sellado','5. Esterilización','6. Almacenamiento y distribución']}
    ],
    quiz:[
@@ -208,7 +209,7 @@ const MODULES=[
   {id:'m3',title:'Norma N°199 MINSAL',icon:'📋',
    slides:[
     {type:'text',title:'¿Qué es la Norma N°199?',content:'La Norma Técnica N°199 del MINSAL establece los requisitos mínimos para el procesamiento de dispositivos médicos en Chile.',list:['Regula toda la cadena de procesamiento de instrumental','De cumplimiento obligatorio para establecimientos de salud','Aplica a prestadores propios y externos (como EsterilMed)']},
-    {type:'youtube',title:'Video: Aspectos clave Norma N°199',videoId:'UKtz-ECS9KI',content:'Resumen de requisitos críticos y fiscalización MINSAL'},
+    {type:'text',title:'Aspectos clave Norma N°199',content:'La Norma N°199 es el marco regulatorio principal para el procesamiento de instrumental médico en Chile.',list:['Flujo unidireccional obligatorio en todas las unidades','Controles físicos, químicos y biológicos documentados','Trazabilidad completa de cada carga procesada','Fiscalización periódica por parte del MINSAL']},
     {type:'text',title:'Requisitos de infraestructura',content:'La norma establece condiciones físicas mínimas para las unidades de procesamiento.',list:['Flujo unidireccional: zona sucia → limpia → estéril','Diferenciales de presión: zona limpia con presión positiva','Temperatura: 18–22°C en zona limpia','Filtración de aire: HEPA en zonas críticas']},
     {type:'text',title:'Controles y registros obligatorios',content:'Toda carga esterilizada debe contar con controles que garanticen la efectividad del proceso.',list:['Indicadores físicos: gráficos de temperatura y presión','Indicadores químicos: tipo 1 (externo) y tipo 5/6 (internos)','Indicadores biológicos: semanal o por carga (ETO)','Trazabilidad: etiqueta con N° lote, fecha venc., operador']}
    ],
@@ -281,16 +282,13 @@ function renderSlides(m){
   m.slides.forEach((s,i)=>{
     const div=document.createElement('div');
     div.className='slide'+(i===0?' active':'');div.id='slide-'+i;
-    if(s.type==='youtube'){
-      const watched=videoWatched[STATE.currentModule+'-'+i];
+    if(s.type==='imagen'){
       div.innerHTML=`<div class="slide-content">
         <div class="slide-title">${s.title}</div>
-        <div class="video-wrap"><iframe src="https://www.youtube.com/embed/${s.videoId}" allowfullscreen></iframe></div>
-        ${watched
-          ? `<div class="video-confirmed">✓ Video confirmado — puedes continuar</div>`
-          : `<button class="video-btn" onclick="confirmarVideo(${i})">✓ He visto el video completo</button>`
-        }
-        <p style="font-size:13px;color:#888;margin-top:8px">${s.content}</p>
+        <div style="text-align:center;margin:10px 0">
+          <img src="${s.imgUrl}" style="max-width:100%;border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,.1)" alt="${s.title}" />
+        </div>
+        <p style="font-size:13px;color:#888;text-align:center;margin-top:8px">${s.content}</p>
       </div>`;
     } else {
       div.innerHTML=`<div class="slide-content">
