@@ -397,7 +397,7 @@ function registrar(modulo,score){
   const aprobado=score>=60?'Sí':'No';
   const data={nombre:STATE.user.name,area:STATE.user.area,turno:STATE.user.turno,modulo:modulo,puntaje:score,fecha:fecha,hora:hora,aprobado:aprobado};
   // Guardar en Google Sheets
-  fetch('https://script.google.com/macros/s/AKfycbwHWlPqqpCIWwfOcItuTQ20qAmPX3iGSm2hCJu7vfpsxG7tKLwy6KkWAJthxrHnOQAj6A/exec',{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(()=>showToast('✓ Registro guardado')).catch(()=>showToast('Sin conexión'));
+  fetch('https://script.google.com/macros/s/AKfycbzuFYIDex1RpuZz3wSMFoczOaCPW89qdoPgCOqjH7aTfNRpzXf32Vmy0rAoXNajJeCKfA/exec',{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(()=>showToast('✓ Registro guardado')).catch(()=>showToast('Sin conexión'));
   // Guardar también localmente como respaldo
   const registros=JSON.parse(localStorage.getItem('registros_esterilmed')||'[]');
   registros.push(data);
