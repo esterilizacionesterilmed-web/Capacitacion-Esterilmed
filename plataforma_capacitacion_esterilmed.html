@@ -396,9 +396,19 @@ function registrar(modulo,score){
   const hora=now.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
   const aprobado=score>=60?'Sí':'No';
   const data={nombre:STATE.user.name,area:STATE.user.area,turno:STATE.user.turno,modulo:modulo,puntaje:score,fecha:fecha,hora:hora,aprobado:aprobado};
-  // Guardar en Google Sheets
-  fetch('https://script.google.com/macros/s/AKfycbzuFYIDex1RpuZz3wSMFoczOaCPW89qdoPgCOqjH7aTfNRpzXf32Vmy0rAoXNajJeCKfA/exec',{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(()=>showToast('✓ Registro guardado')).catch(()=>showToast('Sin conexión'));
-  // Guardar también localmente como respaldo
+  // Usar formulario oculto para evitar CORS
+  const form=document.createElement('form');
+  form.method='POST';
+  form.action='https://script.google.com/macros/s/AKfycbzuFYIDex1RpuZz3wSMFoczOaCPW89qdoPgCOqjH7aTfNRpzXf32Vmy0rAoXNajJeCKfA/exec';
+  form.target='hidden_iframe';
+  const input=document.createElement('input');
+  input.type='hidden';input.name='data';input.value=JSON.stringify(data);
+  form.appendChild(input);document.body.appendChild(form);
+  let iframe=document.getElementById('hidden_iframe');
+  if(!iframe){iframe=document.createElement('iframe');iframe.name='hidden_iframe';iframe.id='hidden_iframe';iframe.style.display='none';document.body.appendChild(iframe);}
+  form.submit();document.body.removeChild(form);
+  showToast('✓ Registro enviado');
+  // Guardar también localmente
   const registros=JSON.parse(localStorage.getItem('registros_esterilmed')||'[]');
   registros.push(data);
   localStorage.setItem('registros_esterilmed',JSON.stringify(registros));
