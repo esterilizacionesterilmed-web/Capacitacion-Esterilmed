@@ -395,11 +395,13 @@ function registrar(modulo,score){
   const fecha=now.toLocaleDateString('es-CL');
   const hora=now.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
   const aprobado=score>=60?'Sí':'No';
-  // Guardar en localStorage como respaldo
+  const data={nombre:STATE.user.name,area:STATE.user.area,turno:STATE.user.turno,modulo:modulo,puntaje:score,fecha:fecha,hora:hora,aprobado:aprobado};
+  // Guardar en Google Sheets
+  fetch('https://script.google.com/macros/s/AKfycbw4M4LJcobvrO1pRXQnvnJ_awqQZ3rimJAc-DPs8_P2F0wF4TnBcBe7eeDrJbmJ2lYQ/exec',{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(()=>showToast('✓ Registro guardado')).catch(()=>showToast('Sin conexión'));
+  // Guardar también localmente como respaldo
   const registros=JSON.parse(localStorage.getItem('registros_esterilmed')||'[]');
-  registros.push({nombre:STATE.user.name,area:STATE.user.area,turno:STATE.user.turno,modulo:modulo,puntaje:score,fecha:fecha,hora:hora,aprobado:aprobado});
+  registros.push(data);
   localStorage.setItem('registros_esterilmed',JSON.stringify(registros));
-  showToast('✓ Registro guardado localmente');
 }
 
 function exportarRegistros(){
@@ -408,7 +410,7 @@ function exportarRegistros(){
   const headers=['Nombre','Área','Turno','Módulo','Puntaje (%)','Fecha','Hora','Aprobado'];
   const rows=registros.map(r=>[r.nombre,r.area,r.turno,r.modulo,r.puntaje,r.fecha,r.hora,r.aprobado]);
   const csv=[headers,...rows].map(r=>r.join(',')).join('\n');
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   a.href=url;a.download='Registro_Capacitaciones_EsterilMed.csv';a.click();
