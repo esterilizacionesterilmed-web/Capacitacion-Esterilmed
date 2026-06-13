@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capacitación Interactiva · Proceso de Esterilización · EsterilMed</title>
+<style>
+  :root{
+    --navy:#1b3a63; --navy2:#27548a; --blue:#4472C4; --blueL:#D9E2F3;
+    --green:#3a9d5d; --greenD:#2c7d49; --ink:#1c2733; --muted:#5b6b7b;
+    --bg:#eef2f7; --card:#ffffff; --warn:#c0392b; --warnBg:#fdecea;
+    --okBg:#e9f7ee; --line:#dde5ee; --shadow:0 18px 50px rgba(20,45,80,.16);
+  }
+  *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    font-family:Arial, Helvetica, sans-serif; color:var(--ink);
+    background:radial-gradient(120% 120% at 50% 0%,#f6f9fd 0%,var(--bg) 60%);
+    display:flex; align-items:center; justify-content:center; min-height:100vh; padding:18px;
+  }
+  /* ---------- STAGE ---------- */
+  .stage{
+    width:min(1060px,100%); aspect-ratio:16/9; background:var(--card);
+    border-radius:20px; box-shadow:var(--shadow); position:relative; overflow:hidden;
+    display:flex; flex-direction:column;
+  }
+  @media (max-width:720px){ .stage{ aspect-ratio:auto; min-height:88vh } }
+
+  /* ---------- HEADER ---------- */
+  .top{ display:flex; align-items:center; gap:12px; padding:16px 26px 0 26px; flex-shrink:0; }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand .logo{ display:flex; align-items:baseline; font-weight:800; letter-spacing:.3px; }
+  .brand .logo .a{ color:var(--navy) } .brand .logo .b{ color:var(--green) }
+  .brand .logo small{ font-size:11px }
+  .crumb{ margin-left:auto; font-size:11px; color:var(--muted); text-align:right; line-height:1.35; }
+  .crumb b{ color:var(--navy) }
+
+  /* ---------- SLIDE BODY ---------- */
+  .slides{ position:relative; flex:1; }
+  .slide{
+    position:absolute; inset:0; padding:14px 40px 22px 40px;
+    display:flex; flex-direction:column; justify-content:center;
+    opacity:0; transform:translateX(34px) scale(.99); pointer-events:none;
+    transition:opacity .45s ease, transform .45s ease;
+  }
+  .slide.active{ opacity:1; transform:none; pointer-events:auto; }
+  .slide.exit-left{ transform:translateX(-34px) scale(.99); }
+  @media (max-width:720px){ .slide{ padding:14px 22px 18px; position:relative; opacity:1; transform:none; display:none } .slide.active{display:flex} }
+
+  h1.kicker{ font-size:13px; letter-spacing:2px; text-transform:uppercase; color:var(--blue); margin-bottom:6px; }
+  h2{ font-size:clamp(20px,3.1vw,33px); color:var(--navy); line-height:1.12; margin-bottom:14px; }
+  h2 .num{ color:var(--green) }
+  p.lead{ font-size:clamp(13px,1.7vw,16px); color:var(--muted); line-height:1.5; max-width:60ch }
+
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .grid3{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  @media (max-width:720px){ .grid2,.grid3{ grid-template-columns:1fr } }
+
+  .card{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px 18px; }
+  .card h3{ font-size:15px; color:var(--navy); margin-bottom:6px; }
+  .card p{ font-size:13px; color:var(--muted); line-height:1.45; }
+
+  .pill{ display:inline-flex; align-items:center; gap:8px; background:var(--blueL); color:var(--navy);
+    font-weight:700; font-size:12px; padding:7px 13px; border-radius:999px; }
+
+  .note{ margin-top:14px; background:var(--blueL); border-radius:12px; padding:12px 16px;
+    font-size:13px; color:var(--navy); display:flex; gap:10px; align-items:flex-start; line-height:1.45; }
+  .note.warn{ background:var(--warnBg); color:var(--warn) }
+  .note.ok{ background:var(--okBg); color:var(--greenD) }
+  .note .ic{ font-size:18px; flex-shrink:0 }
+
+  /* animated reveal items */
+  .rv{ opacity:0; transform:translateY(14px); transition:opacity .5s ease, transform .5s ease; }
+  .slide.active .rv.show{ opacity:1; transform:none; }
+
+  /* ---------- COVER ---------- */
+  .cover{ background:linear-gradient(135deg,var(--navy) 0%,#15406e 55%,var(--greenD) 130%); }
+  .cover .slide{ color:#fff; align-items:flex-start }
+  .cover h2{ color:#fff; font-size:clamp(26px,4.6vw,46px) }
+  .cover .lead{ color:#cfe0f3 }
+  .cover .presenters{ margin-top:18px; font-size:14px; color:#e8f1fb; line-height:1.7 }
+  .cover .presenters b{ color:#fff }
+  .startBtn{ margin-top:26px; background:var(--green); color:#fff; border:none; font-weight:800;
+    font-size:16px; padding:14px 30px; border-radius:999px; cursor:pointer; box-shadow:0 10px 24px rgba(0,0,0,.25);
+    transition:transform .15s ease, background .2s ease; }
+  .startBtn:hover{ transform:translateY(-2px); background:#46b06c }
+
+  /* ---------- CLICKABLE FLOW (9 etapas) ---------- */
+  .flow{ display:grid; grid-template-columns:repeat(9,1fr); gap:8px; margin-top:6px; }
+  @media (max-width:720px){ .flow{ grid-template-columns:repeat(3,1fr) } }
+  .step{ position:relative; background:#fff; border:1.5px solid var(--line); border-radius:12px;
+    padding:12px 6px; text-align:center; cursor:pointer; transition:all .2s ease; }
+  .step:hover{ border-color:var(--blue); transform:translateY(-3px); box-shadow:0 8px 18px rgba(40,84,138,.16) }
+  .step.on{ background:var(--navy); border-color:var(--navy); color:#fff }
+  .step .n{ width:26px;height:26px;border-radius:50%;background:var(--blueL);color:var(--navy);
+    font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;margin:0 auto 6px }
+  .step.on .n{ background:var(--green); color:#fff }
+  .step span{ font-size:10.5px; line-height:1.2; display:block; color:inherit }
+  .flowDetail{ margin-top:14px; background:var(--blueL); border-radius:12px; padding:14px 18px; min-height:64px;
+    font-size:14px; color:var(--navy); line-height:1.5; transition:.2s }
+  .flowDetail b{ color:var(--greenD) }
+
+  /* ---------- DAMAGE ANIM (etapa1) ---------- */
+  .dmgWrap{ display:grid; grid-template-columns:1fr 1fr; gap:14px; align-items:center }
+  @media(max-width:720px){ .dmgWrap{ grid-template-columns:1fr } }
+  .scalpel{ position:relative; height:170px; display:flex; align-items:center; justify-content:center; }
+  .scalpel svg{ width:100%; max-width:330px; height:auto }
+  .rustdot{ opacity:0; transition:opacity .6s ease }
+  .scalpel.show .rustdot{ opacity:.9 }
+  .dmgList{ display:flex; flex-direction:column; gap:10px }
+  .dmg{ background:#fff;border:1px solid var(--line);border-left:0;border-radius:12px;padding:12px 14px;
+    display:flex;gap:12px;align-items:flex-start }
+  .dmg .ic{ width:34px;height:34px;border-radius:9px;background:var(--warnBg);color:var(--warn);
+    display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0 }
+  .dmg h3{ font-size:14px;color:var(--navy);margin-bottom:2px }
+  .dmg p{ font-size:12px;color:var(--muted);line-height:1.4 }
+
+  /* ---------- CHECKLIST build ---------- */
+  .check{ display:flex; gap:11px; align-items:flex-start; padding:9px 4px; border-bottom:1px dashed var(--line) }
+  .check:last-child{ border-bottom:none }
+  .check .b{ width:24px;height:24px;border-radius:7px;background:var(--green);color:#fff;font-weight:800;
+    font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0 }
+  .check p{ font-size:13.5px; color:var(--ink); line-height:1.4 }
+  .check p b{ color:var(--navy) }
+
+  /* ---------- EMPAQUE interactive ---------- */
+  .empRow{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px }
+  .empBtn{ background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:10px 14px;cursor:pointer;
+    font-size:12.5px;color:var(--navy);font-weight:700;transition:.18s; text-align:left; flex:1; min-width:120px }
+  .empBtn:hover{ border-color:var(--blue) }
+  .empBtn.on{ background:var(--navy);color:#fff;border-color:var(--navy) }
+  .empOut{ background:var(--okBg); border-radius:12px; padding:18px; text-align:center }
+  .empOut .big{ font-size:38px; font-weight:800; color:var(--greenD); line-height:1 }
+  .empOut .lbl{ font-size:13px; color:var(--muted); margin-top:6px }
+
+  /* ---------- INDICATOR CARDS ---------- */
+  .cls{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px }
+  @media(max-width:720px){ .cls{ grid-template-columns:repeat(2,1fr) } }
+  .clsCard{ background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;
+    transition:.18s; position:relative; overflow:hidden }
+  .clsCard:hover{ border-color:var(--blue); transform:translateY(-2px) }
+  .clsCard .tag{ font-size:12px;font-weight:800;color:var(--blue) }
+  .clsCard h3{ font-size:14px;color:var(--navy);margin:4px 0 0 }
+  .clsCard .desc{ font-size:11.5px;color:var(--muted);line-height:1.4;max-height:0;opacity:0;
+    transition:.3s; margin-top:0 }
+  .clsCard.on{ background:var(--navy); border-color:var(--navy) }
+  .clsCard.on .tag{ color:#8fd3a8 } .clsCard.on h3{ color:#fff }
+  .clsCard.on .desc{ max-height:120px;opacity:1;color:#cfe0f3;margin-top:8px }
+
+  /* ---------- CONTAINERS flip ---------- */
+  .contRow{ display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:6px }
+  @media(max-width:720px){ .contRow{ grid-template-columns:1fr } }
+  .cont{ border-radius:16px; padding:22px; color:#fff; cursor:pointer; min-height:160px;
+    display:flex; flex-direction:column; justify-content:center; transition:transform .2s ease }
+  .cont:hover{ transform:translateY(-4px) }
+  .cont.red{ background:linear-gradient(135deg,#c0392b,#922b21) }
+  .cont.blue{ background:linear-gradient(135deg,var(--blue),#2c5aa0) }
+  .cont .ic{ font-size:30px; margin-bottom:8px }
+  .cont h3{ font-size:20px; margin-bottom:6px }
+  .cont p{ font-size:13px; opacity:.95; line-height:1.45 }
+  .cont .hint{ font-size:11px; opacity:.8; margin-top:10px }
+
+  /* ---------- TIMELINE ---------- */
+  .tl{ display:flex; flex-direction:column; gap:8px }
+  .tlPhase{ background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 16px }
+  .tlPhase h3{ font-size:13px;color:var(--blue);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px }
+  .tlBar{ display:flex; gap:6px; flex-wrap:wrap; align-items:center }
+  .tlSeg{ background:var(--blueL); color:var(--navy); font-size:11.5px; font-weight:700;
+    padding:6px 11px; border-radius:8px; white-space:nowrap }
+  .tlSeg.tot{ background:var(--green); color:#fff }
+
+  /* ---------- QUIZ ---------- */
+  .quizSlide{ background:linear-gradient(135deg,#f3f7fc,#e7eef8) }
+  .quizCard{ background:#fff; border-radius:18px; box-shadow:0 14px 40px rgba(30,60,110,.12);
+    padding:26px 30px; max-width:680px; margin:0 auto; width:100% }
+  .quizCard .qtag{ font-size:12px; font-weight:800; letter-spacing:1.5px; color:var(--green); text-transform:uppercase }
+  .quizCard h2{ font-size:clamp(18px,2.6vw,25px); margin:8px 0 18px }
+  .opt{ display:block; width:100%; text-align:left; background:#fff; border:1.5px solid var(--line);
+    border-radius:12px; padding:13px 16px; margin-bottom:10px; font-size:14px; color:var(--ink);
+    cursor:pointer; transition:.15s; font-family:inherit }
+  .opt:hover{ border-color:var(--blue); background:#f7faff }
+  .opt.correct{ border-color:var(--green); background:var(--okBg); color:var(--greenD); font-weight:700 }
+  .opt.wrong{ border-color:var(--warn); background:var(--warnBg); color:var(--warn) }
+  .opt:disabled{ cursor:default }
+  .feedback{ margin-top:12px; font-size:13.5px; line-height:1.5; padding:12px 16px; border-radius:10px;
+    display:none }
+  .feedback.show{ display:block }
+  .feedback.good{ background:var(--okBg); color:var(--greenD) }
+  .feedback.bad{ background:var(--warnBg); color:var(--warn) }
+
+  /* ---------- CLOSING ---------- */
+  .closing{ background:linear-gradient(135deg,var(--navy),#15406e) }
+  .closing .slide{ color:#fff; align-items:center; text-align:center }
+  .closing h2{ color:#fff; font-size:clamp(22px,3.6vw,38px) }
+  .closing .sub{ color:#bcd2ec; font-size:clamp(15px,2vw,20px); margin-top:10px; line-height:1.4 }
+  .closing .ticks{ display:flex; gap:22px; margin-top:26px; flex-wrap:wrap; justify-content:center }
+  .closing .tick{ font-size:15px; color:#dff0e7 } .closing .tick b{ color:#7fe0a3 }
+
+  /* ---------- NAV ---------- */
+  .nav{ display:flex; align-items:center; gap:12px; padding:12px 26px 16px; flex-shrink:0;
+    border-top:1px solid var(--line); }
+  .progress{ flex:1; height:7px; background:#e3eaf3; border-radius:99px; overflow:hidden }
+  .progress .bar{ height:100%; background:linear-gradient(90deg,var(--blue),var(--green)); width:0%;
+    border-radius:99px; transition:width .4s ease }
+  .navBtn{ border:none; width:40px;height:40px;border-radius:50%; background:var(--navy); color:#fff;
+    font-size:18px; cursor:pointer; display:flex;align-items:center;justify-content:center; transition:.15s }
+  .navBtn:hover{ background:var(--navy2) }
+  .navBtn:disabled{ background:#c3cdd9; cursor:default }
+  .counter{ font-size:12px; color:var(--muted); min-width:54px; text-align:center; font-variant-numeric:tabular-nums }
+  .hintKeys{ position:absolute; bottom:70px; left:50%; transform:translateX(-50%); font-size:11px;
+    color:var(--muted); background:#fff; padding:5px 12px; border-radius:99px; box-shadow:0 4px 14px rgba(0,0,0,.08);
+    opacity:.9; pointer-events:none }
+  @media(max-width:720px){ .hintKeys{ display:none } }
+
+
+  .brand .logoImg{ height:34px; width:auto; display:block; background:#fff; padding:3px 6px; border-radius:7px; }
+  .credit{ font-size:11px; color:var(--muted); }
+  .cover .credit-cover{ margin-top:14px; font-size:12.5px; color:#9fc0e6; letter-spacing:.3px; }
+  .cover .credit-cover b{ color:#dcebff; }
+  .closing .credit-close{ margin-top:24px; font-size:12.5px; color:#9bb6d6; }
+  .closing .credit-close b{ color:#cfe0f3 }
+  .counter-big{ font-size:clamp(40px,8vw,84px); font-weight:800; color:var(--green); line-height:1 }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="top">
+    <div class="brand"><img class="logoImg" src="data:image/jpeg;base64,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" alt="EsterilMed"></div>
+    <div class="crumb"><b id="crumbTitle">Capacitación</b><br>Proceso de Esterilización de Instrumental Quirúrgico</div>
+  </div>
+
+  <div class="slides" id="slides"><!-- slides injected --></div>
+
+  <div class="nav">
+    <button class="navBtn" id="prev" aria-label="Anterior">‹</button>
+    <div class="counter" id="counter">1 / 1</div>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <button class="navBtn" id="next" aria-label="Siguiente">›</button>
+  </div>
+  <div class="hintKeys">Usa ← → o la barra espaciadora para avanzar</div>
+</div>
+
+<script>
+/* ============================================================
+   CONTENIDO — cada slide es un objeto con html y (opcional) onShow
+   ============================================================ */
+const S = [];
+
+/* 1. PORTADA */
+S.push({ crumb:"Bienvenida", bgClass:"cover", html:`
+  <h1 class="kicker">Capacitación Técnica</h1>
+  <h2>Proceso de Esterilización<br>de Instrumental Quirúrgico</h2>
+  <p class="lead">Para personal de pabellón y central de esterilización. Un recorrido interactivo por cada etapa del proceso, los controles de calidad y la trazabilidad EsterilMed.</p>
+  <div class="presenters">
+    <b>Marjorie Miranda Gatica</b> · Directora Técnica
+  </div>
+  <div class="credit-cover">Material elaborado por <b>Marjorie Miranda Gatica</b> · Directora Técnica EsterilMed SpA</div>
+  <button class="startBtn" onclick="go(1)">Comenzar capacitación →</button>
+`});
+
+/* 2. ¿QUÉ ES? */
+S.push({ crumb:"Conceptos", html:`
+  <h1 class="kicker">Punto de partida</h1>
+  <h2>¿Qué es la esterilización?</h2>
+  <div class="grid2">
+    <div class="card rv"><h3>Definición</h3><p>Destrucción completa de toda forma de vida microbiana, <b>incluyendo esporas bacterianas y priones</b> — las formas con mayor resistencia a los métodos de esterilización.</p></div>
+    <div class="card rv"><h3>Objetivo en salud</h3><p>Prevenir las Infecciones Asociadas a la Atención de Salud (IAAS). Es la <b>última barrera de seguridad</b> antes de que el instrumental llegue al campo operatorio.</p></div>
+  </div>
+  <div class="note ok rv" style="align-items:center">
+    <div class="ic">✔</div>
+    <div>Tras un proceso correctamente realizado, la probabilidad de que sobreviva un microorganismo es menor a
+    <b style="font-size:16px">1 en 1.000.000</b>.</div>
+  </div>
+`, reveal:true });
+
+/* 3. LAS 9 ETAPAS — esquema clicable */
+S.push({ crumb:"Mapa del proceso", html:`
+  <h1 class="kicker">Esquema interactivo</h1>
+  <h2>Las 9 etapas del proceso en EsterilMed</h2>
+  <p class="lead" style="margin-bottom:10px">Toca cada etapa para ver de qué se trata. La <b>trazabilidad</b> acompaña todo el recorrido, desde la recepción hasta la entrega.</p>
+  <div class="flow" id="flow"></div>
+  <div class="flowDetail" id="flowDetail">👆 Toca una etapa para ver el detalle.</div>
+`, onShow:buildFlow });
+
+/* 4. ETAPA 1 — Descontaminación + daños animados */
+S.push({ crumb:"Etapa 1", html:`
+  <h1 class="kicker">Etapa 1</h1>
+  <h2><span class="num">1.</span> Descontaminación intrapabellón</h2>
+  <div class="dmgWrap">
+    <div class="scalpel" id="scalpel">
+      <svg viewBox="0 0 340 120" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="steel" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stop-color="#dfe7ef"/><stop offset="1" stop-color="#9fb0c2"/></linearGradient></defs>
+        <rect x="20" y="52" width="180" height="16" rx="8" fill="url(#steel)" stroke="#7f93a8"/>
+        <path d="M200 50 L300 44 Q318 52 300 76 L200 70 Z" fill="url(#steel)" stroke="#7f93a8"/>
+        <circle class="rustdot" cx="120" cy="60" r="7" fill="#b5651d"/>
+        <circle class="rustdot" cx="160" cy="58" r="5" fill="#8a4b13"/>
+        <circle class="rustdot" cx="245" cy="58" r="8" fill="#b5651d"/>
+        <circle class="rustdot" cx="270" cy="62" r="5" fill="#7a3f10"/>
+        <circle class="rustdot" cx="90" cy="62" r="4" fill="#a85a1a"/>
+      </svg>
+    </div>
+    <div class="dmgList">
+      <div class="dmg rv"><div class="ic">🟤</div><div><h3>Picaduras de corrosión (pitting)</h3><p>Los iones de cloruro atacan la capa protectora del acero inoxidable.</p></div></div>
+      <div class="dmg rv"><div class="ic">🟫</div><div><h3>Manchas café / óxido</h3><p>Aparecen manchas pardas que debilitan el instrumental.</p></div></div>
+      <div class="dmg rv"><div class="ic">🦠</div><div><h3>Biofilm y fatiga del material</h3><p>El uso repetido con suero y sangre acelera el deterioro estructural y acorta la vida útil.</p></div></div>
+    </div>
+  </div>
+  <div class="note warn rv"><div class="ic">⚠</div><div>El suero fisiológico (NaCl 0,9%) <b>ayuda al paciente, pero es enemigo del instrumental</b>: los cloruros destruyen la capa protectora y producen corrosión si queda horas expuesto.</div></div>
+`, reveal:true, onShow:()=>{ setTimeout(()=>document.getElementById('scalpel')?.classList.add('show'),500); } });
+
+/* 5. QUIZ 1 */
+S.push({ crumb:"Quiz", bgClass:"quizSlide", quiz:{
+  q:"¿Por qué el suero fisiológico daña el instrumental quirúrgico?",
+  opts:[
+    "Porque aumenta la temperatura del acero",
+    "Porque los cloruros destruyen la capa protectora y generan corrosión",
+    "Porque deja residuos de detergente enzimático",
+    "Porque reduce el filo del instrumental"
+  ],
+  correct:1,
+  good:"Correcto. Los cloruros (Cl⁻) del NaCl 0,9% atacan la capa pasiva del acero inoxidable, produciendo pitting, óxido y biofilm.",
+  bad:"No exactamente. El problema son los cloruros del suero, que destruyen la capa protectora del acero y generan corrosión."
+}});
+
+/* 6. ETAPA 2 — Recepción */
+S.push({ crumb:"Etapa 2", html:`
+  <h1 class="kicker">Etapa 2</h1>
+  <h2><span class="num">2.</span> Recepción de cajas quirúrgicas</h2>
+  <div class="grid2">
+    <div>
+      <div class="check rv"><div class="b">1</div><p><b>Inventario completo:</b> verificar que el instrumental corresponda al inventario de la caja.</p></div>
+      <div class="check rv"><div class="b">2</div><p><b>Integridad:</b> detectar instrumental doblado, roto, con corrosión o mal funcionamiento.</p></div>
+      <div class="check rv"><div class="b">3</div><p><b>Identificación:</b> confirmar que la caja esté correctamente identificada con el cliente.</p></div>
+      <div class="check rv"><div class="b">4</div><p><b>Registro obligatorio:</b> ingresar la recepción en el sistema de trazabilidad EsterilMed.</p></div>
+    </div>
+    <div class="card rv" style="background:var(--blueL);border-color:transparent">
+      <h3>📋 Formularios de intercambio</h3>
+      <p style="margin-top:6px">Existen <b>3 formularios físicos</b>: Pabellón Quirúrgico, Material Médico y Dental. Cada uno con <b>3 hojas de distintos colores</b> — la última copia queda con el cliente.</p>
+      <p style="margin-top:8px">Van en una carpeta fuera del contenedor, en bolsa, para evitar contaminación. Incluir control biológico o ciclo de priones cuando corresponda.</p>
+    </div>
+  </div>
+  <div class="note rv"><div class="ic">📝</div><div>Todo lo que ingresa debe quedar registrado. <b>La hoja de intercambio es el documento legal del proceso.</b></div></div>
+`, reveal:true });
+
+/* 7. TRAZABILIDAD */
+S.push({ crumb:"Trazabilidad", html:`
+  <h1 class="kicker">Columna vertebral del proceso</h1>
+  <h2>Trazabilidad en EsterilMed</h2>
+  <div class="grid2">
+    <div class="card rv"><h3>¿Qué es?</h3><p>El registro que permite identificar <b>quién</b> procesó cada caja, <b>en qué equipo</b>, con <b>qué ciclo</b>, <b>cuándo</b> y <b>a qué cliente</b> fue entregada — en cualquier punto del tiempo.</p></div>
+    <div class="card rv"><h3>Debe quedar registrado</h3><p style="line-height:1.7">• Nombre del set / caja quirúrgica<br>• N° de carga y equipo esterilizador<br>• Fecha de proceso y de vencimiento<br>• Operador responsable<br>• Cliente de destino y hoja de intercambio</p></div>
+  </div>
+  <div class="note warn rv"><div class="ic">❌</div><div>Una trazabilidad incompleta es un <b>reporte de incidente</b>. La hoja de intercambio sin registro es inaceptable.</div></div>
+`, reveal:true });
+
+/* 8. QUIZ 2 */
+S.push({ crumb:"Quiz", bgClass:"quizSlide", quiz:{
+  q:"Una caja se entrega al cliente pero NO se registró el operador responsable. ¿Qué ocurre?",
+  opts:[
+    "No pasa nada si la caja está estéril",
+    "Se considera una trazabilidad incompleta → reporte de incidente",
+    "Se corrige al mes siguiente",
+    "Lo registra automáticamente el autoclave"
+  ],
+  correct:1,
+  good:"Correcto. Sin operador responsable la trazabilidad queda incompleta, y eso constituye un reporte de incidente.",
+  bad:"Recuerda: aunque la caja esté estéril, la falta de registro genera una trazabilidad incompleta = reporte de incidente."
+}});
+
+/* 9. ETAPA 3 — Lavado */
+S.push({ crumb:"Etapa 3", html:`
+  <h1 class="kicker">Etapa 3</h1>
+  <h2><span class="num">3.</span> Lavado de instrumental</h2>
+  <div class="grid2">
+    <div>
+      <div class="check rv"><div class="b">1</div><p>Desmontar todo el instrumental articulado.</p></div>
+      <div class="check rv"><div class="b">2</div><p>Prelavado con detergente enzimático (Triplenzimatic®): <b>3–5 min</b>, temperatura 37–55°C.</p></div>
+      <div class="check rv"><div class="b">3</div><p>Cepillar cremalleras, uniones y estrías con hisopo.</p></div>
+      <div class="check rv"><div class="b">4</div><p>Lavar canulados con hisopo y lavadora vaporizadora ELMA.</p></div>
+    </div>
+    <div>
+      <div class="check rv"><div class="b">5</div><p>Lavadora ultrasónica: <b>10 min</b>.</p></div>
+      <div class="check rv"><div class="b">6</div><p>Termodesinfectora: <b>1 h 20 min</b>.</p></div>
+      <div class="check rv"><div class="b">7</div><p>Enjuague final con <b>agua osmotizada</b> (pura, baja en minerales).</p></div>
+    </div>
+  </div>
+  <div class="note rv"><div class="ic">💧</div><div>La termodesinfectora es <b>obligatoria</b> para traumatología, sistema nervioso central, ginecología y columna.</div></div>
+`, reveal:true });
+
+/* 10. TERMODESINFECCIÓN */
+S.push({ crumb:"Norma N°199", html:`
+  <h1 class="kicker">Etapa previa obligatoria</h1>
+  <h2>Termodesinfección — Norma N°199</h2>
+  <div class="grid2">
+    <div class="card rv"><h3>¿Qué es?</h3><p>Proceso que combina <b>calor, detergente y agua</b> para eliminar microorganismos patógenos y reducir la carga microbiana a niveles seguros <b>antes</b> de la esterilización.</p></div>
+    <div class="card rv"><h3>Indicaciones obligatorias (NT N°199)</h3><p style="line-height:1.7">• Instrumental de traumatología<br>• Instrumental ginecológico<br>• Instrumental de columna<br>• Todo instrumental con lúmenes complejos</p></div>
+  </div>
+  <div class="note warn rv"><div class="ic">⚠</div><div>La termodesinfectora <b>NO reemplaza</b> a la esterilización. Es una etapa previa obligatoria.</div></div>
+`, reveal:true });
+
+/* 11. QUIZ 3 */
+S.push({ crumb:"Quiz", bgClass:"quizSlide", quiz:{
+  q:"¿La termodesinfección reemplaza al proceso de esterilización?",
+  opts:[
+    "Sí, si el instrumental es de traumatología",
+    "Sí, cuando el ciclo dura más de 1 hora",
+    "No, es una etapa previa obligatoria que no reemplaza la esterilización",
+    "Solo para instrumental dental"
+  ],
+  correct:2,
+  good:"Correcto. La termodesinfección reduce la carga microbiana, pero la esterilización siempre es necesaria después.",
+  bad:"No. La termodesinfección es una etapa previa obligatoria, pero nunca reemplaza la esterilización."
+}});
+
+/* 12. ETAPA 4 — Inspección */
+S.push({ crumb:"Etapa 4", html:`
+  <h1 class="kicker">Etapa 4 · El filtro más importante</h1>
+  <h2><span class="num">4.</span> Inspección, lubricación y preparación</h2>
+  <div class="grid2">
+    <div class="card rv"><h3>🔍 Verificar limpieza</h3><p>Detectar restos de materia orgánica o inorgánica — los más frecuentes en nuestros reportes.</p></div>
+    <div class="card rv"><h3>🔧 Integridad</h3><p>Revisar filos, articulaciones, cremalleras y cierres. Separar lo deteriorado.</p></div>
+    <div class="card rv"><h3>⚙ Funcionalidad</h3><p>Probar apertura/cierre y que las articulaciones funcionen correctamente.</p></div>
+    <div class="card rv"><h3>💧 Lubricación</h3><p>Aplicar lubricante en todas las articulaciones. Mejora la vida útil del instrumental.</p></div>
+  </div>
+  <div class="note ok rv"><div class="ic">🔍</div><div>La inspección bajo lupa es <b>el filtro más importante</b> para prevenir reportes de materia orgánica e inorgánica a clientes.</div></div>
+`, reveal:true });
+
+/* 13. ETAPA 5 — Empaque interactivo */
+S.push({ crumb:"Etapa 5", html:`
+  <h1 class="kicker">Etapa 5 · Interactivo</h1>
+  <h2><span class="num">5.</span> Preparación y empaque — vigencias</h2>
+  <p class="lead" style="margin-bottom:12px">Toca un tipo de empaque para ver su vigencia.</p>
+  <div class="empRow" id="empRow"></div>
+  <div class="empOut" id="empOut"><div class="big">—</div><div class="lbl">Selecciona un tipo de empaque arriba</div></div>
+  <div class="note warn rv show" style="margin-top:12px"><div class="ic">⚠</div><div>La vigencia puede ser <b>MENOR</b> si las condiciones de almacenamiento no son adecuadas.</div></div>
+`, onShow:buildEmpaque });
+
+/* 14. LECTURA DE LOTE */
+S.push({ crumb:"Etiquetado", html:`
+  <h1 class="kicker">Saber leer el paquete</h1>
+  <h2>Lectura del número de lote</h2>
+  <p class="lead" style="margin-bottom:10px">Toda etiqueta de un paquete estéril contiene estos datos:</p>
+  <div class="grid3">
+    <div class="card rv"><div class="pill">N° de Carga</div><p style="margin-top:8px">Número correlativo del ciclo de esterilización.</p></div>
+    <div class="card rv"><div class="pill">N° de Equipo</div><p style="margin-top:8px">Identifica el autoclave o esterilizador utilizado.</p></div>
+    <div class="card rv"><div class="pill">Mes de carga</div><p style="margin-top:8px">Mes en que se realizó el proceso.</p></div>
+    <div class="card rv"><div class="pill">F. Vencimiento</div><p style="margin-top:8px">Según tipo de empaque (3, 6 o 12 meses).</p></div>
+    <div class="card rv"><div class="pill">Operador</div><p style="margin-top:8px">Nombre o código del funcionario responsable.</p></div>
+    <div class="card rv" style="background:var(--navy);border-color:transparent;display:flex;align-items:center;justify-content:center">
+      <p style="color:#cfe0f3;text-align:center">🏷️ Cada dato permite rastrear la caja en cualquier momento.</p></div>
+  </div>
+`, reveal:true });
+
+/* 15. ETAPA 6 — Autoclave */
+S.push({ crumb:"Etapa 6", html:`
+  <h1 class="kicker">Etapa 6 · Métodos de esterilización</h1>
+  <h2>Esterilización en autoclave (vapor)</h2>
+  <div class="grid3">
+    <div class="card rv" style="text-align:center"><div class="counter-big" style="font-size:30px">134°C</div><p style="margin-top:6px">3 bar · 5 min — ciclo estándar para instrumental metálico.</p></div>
+    <div class="card rv" style="text-align:center"><div class="counter-big" style="font-size:30px">121°C</div><p style="margin-top:6px">2 bar · 20 min — ciclo alternativo para material más sensible.</p></div>
+    <div class="card rv" style="text-align:center"><div class="counter-big" style="font-size:30px;color:var(--blue)">H₂O</div><p style="margin-top:6px">Agua osmotizada / desmineralizada — protege instrumental y equipo.</p></div>
+  </div>
+  <div class="note warn rv"><div class="ic">⚠</div><div>Cuidado con: cloruros (corrosión), silicatos (descoloración) y partículas de óxido en el sistema de vapor.</div></div>
+`, reveal:true });
+
+/* 16. INDICADORES QUÍMICOS — clicables */
+S.push({ crumb:"Controles de calidad", html:`
+  <h1 class="kicker">Esquema clicable</h1>
+  <h2>Indicadores químicos — Clases 1 a 6</h2>
+  <p class="lead" style="margin-bottom:10px">Toca cada clase para ver qué verifica.</p>
+  <div class="cls" id="clsGrid"></div>
+`, onShow:buildClases });
+
+/* 17. QUIZ 4 */
+S.push({ crumb:"Quiz", bgClass:"quizSlide", quiz:{
+  q:"¿Cuál indicador químico responde a TODAS las variables del ciclo (tiempo, presión, humedad y temperatura)?",
+  opts:["Clase 1 (proceso)","Clase 3 (un parámetro)","Clase 5 (integrador)","Clase 2 (Bowie-Dick)"],
+  correct:2,
+  good:"Correcto. El Clase 5 (integrador) responde a todas las variables críticas del ciclo.",
+  bad:"El que responde a todas las variables es el Clase 5 (integrador). El Clase 6 (emulador) lo hace para un ciclo específico."
+}});
+
+/* 18. INDICADORES BIOLÓGICOS */
+S.push({ crumb:"Controles biológicos", html:`
+  <h1 class="kicker">El control más exigente</h1>
+  <h2>Indicadores biológicos</h2>
+  <div class="grid3">
+    <div class="card rv"><h3>Autoclave — Vapor</h3><p><b>24 min</b><br>Espora: <i>Geobacillus stearothermophilus</i></p></div>
+    <div class="card rv"><h3>Peróxido de Hidrógeno</h3><p><b>24 min</b><br>Espora: <i>Geobacillus stearothermophilus</i></p></div>
+    <div class="card rv"><h3>Óxido de Etileno</h3><p><b>24 min</b><br>Espora: <i>Bacillus atrophaeus</i></p></div>
+  </div>
+  <div class="note rv"><div class="ic">📋</div><div>Esporas impregnadas + ampolleta con medio de cultivo (fluorescencia/pH). Uso <b>obligatorio</b> en implantes, reparación/mantención de equipos y <b>semanalmente</b> como control de rutina (Norma N°199).</div></div>
+`, reveal:true });
+
+/* 19. ETAPA 7 — Almacenamiento */
+S.push({ crumb:"Etapa 7", html:`
+  <h1 class="kicker">Etapa 7</h1>
+  <h2><span class="num">7.</span> Almacenamiento y distribución</h2>
+  <div class="grid2">
+    <div class="card rv"><h3>🌡️ Temperatura</h3><p>Controlada entre <b>18°C y 24°C</b>, humedad 30–50%.</p></div>
+    <div class="card rv"><h3>💨 Circulación de aire</h3><p>Rejillas limpias, separadas <b>al menos 30 cm del piso</b> y alejadas de muros.</p></div>
+    <div class="card rv"><h3>🔄 Orden FIFO</h3><p>Lo primero que vence, primero que se utiliza. Verificar siempre la fecha de vencimiento.</p></div>
+    <div class="card rv"><h3>📦 Empaque íntegro</h3><p>Empaque roto, húmedo o sin viraje del indicador = <b>material NO estéril</b>.</p></div>
+  </div>
+  <div class="note ok rv"><div class="ic">🏥</div><div>En EsterilMed el material estéril es <b>verificado nuevamente por el área estéril</b> antes de la entrega al cliente.</div></div>
+`, reveal:true });
+
+/* 20. CONTENEDORES — clicables */
+S.push({ crumb:"Transporte", html:`
+  <h1 class="kicker">No confundir</h1>
+  <h2>Contenedores de transporte</h2>
+  <p class="lead" style="margin-bottom:6px">Toca cada contenedor. Siempre deben ir cerrados herméticamente — revisar sellos antes de entregar al transportista.</p>
+  <div class="contRow">
+    <div class="cont red" id="contRed"><div class="ic">🟥</div><h3>Contenedor ROJO</h3><p>Material <b>SUCIO</b>. Se entrega al transportista con el instrumental que debe ser esterilizado.</p><div class="hint">Toca para resaltar →</div></div>
+    <div class="cont blue" id="contBlue"><div class="ic">🟦</div><h3>Contenedor AZUL</h3><p>Material <b>LIMPIO / ESTÉRIL</b>. Es el que EsterilMed entrega al cliente con el material ya esterilizado.</p><div class="hint">Toca para resaltar →</div></div>
+  </div>
+`, onShow:buildContainers });
+
+/* 21. QUIZ 5 */
+S.push({ crumb:"Quiz", bgClass:"quizSlide", quiz:{
+  q:"¿En qué contenedor se entrega el material YA esterilizado al cliente?",
+  opts:["Contenedor rojo","Contenedor azul","Cualquiera, si va sellado","En la carpeta de formularios"],
+  correct:1,
+  good:"Correcto. Azul = limpio/estéril (hacia el cliente). Rojo = sucio (hacia EsterilMed).",
+  bad:"Recuerda: AZUL es limpio/estéril hacia el cliente; ROJO es sucio hacia EsterilMed."
+}});
+
+/* 22. TIEMPOS */
+S.push({ crumb:"Tiempos", html:`
+  <h1 class="kicker">¿Cuánto demora?</h1>
+  <h2>Duración del proceso completo</h2>
+  <div class="tl">
+    <div class="tlPhase rv"><h3>Fase 1 — Lavado y descontaminación</h3>
+      <div class="tlBar"><span class="tlSeg">Prelavado 3–5'</span><span class="tlSeg">Ultrasonido 10'</span><span class="tlSeg">Enjuague 5'</span><span class="tlSeg">Termodesinfectora 1h20'</span><span class="tlSeg tot">≈ 1h 50min</span></div></div>
+    <div class="tlPhase rv"><h3>Fase 2 — Inspección, armado y empaque</h3>
+      <div class="tlBar"><span class="tlSeg">Inspección · Lubricación · Armado · Empaque · Etiquetado</span><span class="tlSeg tot">≈ 30min</span></div></div>
+    <div class="tlPhase rv"><h3>Fase 3 — Esterilización y enfriamiento</h3>
+      <div class="tlBar"><span class="tlSeg">Autoclave 1h20' + enfriamiento</span><span class="tlSeg tot">≈ 4 h</span><span class="tlSeg">STERRAD 35–58' + enfriamiento</span><span class="tlSeg tot">≈ 3 h</span></div></div>
+  </div>
+`, reveal:true });
+
+/* 23. REPORTE DE INCIDENTES */
+S.push({ crumb:"Incidentes", html:`
+  <h1 class="kicker">Cuándo reportar</h1>
+  <h2>Reporte de incidentes</h2>
+  <div class="grid2">
+    <div>
+      <div class="check rv"><div class="b" style="background:var(--warn)">!</div><p>Diferencias en el número de piezas o instrumental dañado.</p></div>
+      <div class="check rv"><div class="b" style="background:var(--warn)">!</div><p>Contenedor llegó abierto o con sello roto.</p></div>
+      <div class="check rv"><div class="b" style="background:var(--warn)">!</div><p>Control químico o indicador fallido.</p></div>
+      <div class="check rv"><div class="b" style="background:var(--warn)">!</div><p>Retraso o problema con el transporte.</p></div>
+      <div class="check rv"><div class="b" style="background:var(--warn)">!</div><p>Error o inconsistencia en el formulario de intercambio.</p></div>
+    </div>
+    <div class="card rv" style="background:var(--navy);border-color:transparent;display:flex;flex-direction:column;justify-content:center">
+      <p style="color:#cfe0f3;margin-bottom:8px">Para reportar cualquier incidente, comunicarse directamente con:</p>
+      <h3 style="color:#fff;font-size:17px">Enf. Marjorie Miranda</h3>
+      <p style="color:#9fd3b3;margin-top:6px;font-size:14px">✆ 9 6125 0777<br>✉ m.miranda@esterilmed.cl</p>
+    </div>
+  </div>
+`, reveal:true });
+
+/* 24. DOCUMENTACIÓN */
+S.push({ crumb:"Documentación", html:`
+  <h1 class="kicker">Respaldo del proceso</h1>
+  <h2>Los 4 documentos de cada entrega</h2>
+  <div class="grid2">
+    <div class="card rv"><h3>1 · Voucher de carga</h3><p>Copia física del ticket impreso por el autoclave que certifica las variables físicas del ciclo.</p></div>
+    <div class="card rv"><h3>2 · Registro de carga</h3><p>Documento original de EsterilMed con los datos técnicos de la carga, firmado por el operador.</p></div>
+    <div class="card rv"><h3>3 · Check list de entrega</h3><p>Validación visual que asegura la integridad de los empaques antes del despacho.</p></div>
+    <div class="card rv"><h3>4 · Formulario de intercambio</h3><p>Documento legal de entrega, firmado en conformidad junto con el cliente.</p></div>
+  </div>
+`, reveal:true });
+
+/* 25. CIERRE */
+S.push({ crumb:"Cierre", bgClass:"closing", html:`
+  <h2>La esterilización no es solo un proceso técnico.</h2>
+  <p class="sub">Es la última línea de defensa entre el instrumental y el paciente.</p>
+  <div class="ticks">
+    <div class="tick"><b>✓</b> Cada paso importa</div>
+    <div class="tick"><b>✓</b> Cada registro importa</div>
+    <div class="tick"><b>✓</b> Cada control importa</div>
+  </div>
+  <div class="credit-close">Capacitación elaborada por <b>Marjorie Miranda Gatica</b> · Directora Técnica · EsterilMed SpA</div>
+  <button class="startBtn" style="margin-top:22px;background:var(--green)" onclick="go(0)">↻ Reiniciar capacitación</button>
+`});
+
+/* ============================================================
+   MOTOR DE LA PRESENTACIÓN
+   ============================================================ */
+const slidesEl = document.getElementById('slides');
+const stage = document.getElementById('stage');
+let cur = 0;
+
+// build slide DOM
+S.forEach((s,i)=>{
+  const d = document.createElement('div');
+  d.className = 'slide' + (s.bgClass?(' '+s.bgClass):'');
+  if(s.quiz){ d.innerHTML = quizHTML(s.quiz, i); }
+  else { d.innerHTML = s.html; }
+  d.dataset.idx = i;
+  slidesEl.appendChild(d);
+  s._el = d;
+});
+
+// background helpers for whole-stage themed slides (cover/closing/quiz)
+function applyStageBg(i){
+  stage.classList.remove('cover','closing','quizSlide');
+  const cls = S[i].bgClass;
+  if(cls){ stage.classList.add(cls); }
+}
+
+function quizHTML(q, idx){
+  return `<div class="quizCard">
+    <div class="qtag">Comprobemos lo aprendido</div>
+    <h2>${q.q}</h2>
+    <div id="opts-${idx}">${q.opts.map((o,j)=>`<button class="opt" onclick="answer(${idx},${j})">${o}</button>`).join('')}</div>
+    <div class="feedback" id="fb-${idx}"></div>
+  </div>`;
+}
+
+window.answer = function(idx,j){
+  const q = S[idx].quiz;
+  if(S[idx]._answered) return;
+  S[idx]._answered = true;
+  const opts = document.querySelectorAll(`#opts-${idx} .opt`);
+  opts.forEach((b,k)=>{ b.disabled=true; if(k===q.correct) b.classList.add('correct'); });
+  const fb = document.getElementById(`fb-${idx}`);
+  if(j===q.correct){ fb.className='feedback show good'; fb.textContent='✔ '+q.good; }
+  else { opts[j].classList.add('wrong'); fb.className='feedback show bad'; fb.textContent='✕ '+q.bad; }
+};
+
+function render(prev){
+  S.forEach((s,i)=>{
+    s._el.classList.remove('active','exit-left');
+    if(i===cur){ s._el.classList.add('active'); }
+    else if(i<cur){ s._el.classList.add('exit-left'); }
+  });
+  applyStageBg(cur);
+  document.getElementById('crumbTitle').textContent = S[cur].crumb || 'Capacitación';
+  document.getElementById('counter').textContent = (cur+1)+' / '+S.length;
+  document.getElementById('bar').style.width = ((cur)/(S.length-1)*100)+'%';
+  document.getElementById('prev').disabled = cur===0;
+  document.getElementById('next').disabled = cur===S.length-1;
+  // reveal animation
+  if(S[cur].reveal){ revealSeq(S[cur]._el); }
+  if(S[cur].onShow){ S[cur].onShow(); }
+}
+
+function revealSeq(el){
+  const items = el.querySelectorAll('.rv');
+  items.forEach((it,k)=>{ it.classList.remove('show'); setTimeout(()=>it.classList.add('show'), 120 + k*140); });
+}
+
+window.go = function(i){ const prev=cur; cur=Math.max(0,Math.min(S.length-1,i)); render(prev); };
+function next(){ if(cur<S.length-1) go(cur+1); }
+function prev(){ if(cur>0) go(cur-1); }
+
+document.getElementById('next').onclick = next;
+document.getElementById('prev').onclick = prev;
+document.addEventListener('keydown', e=>{
+  if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){ e.preventDefault(); next(); }
+  if(e.key==='ArrowLeft'||e.key==='PageUp'){ e.preventDefault(); prev(); }
+  if(e.key==='Home'){ go(0); } if(e.key==='End'){ go(S.length-1); }
+});
+// swipe
+let tx=0;
+slidesEl.addEventListener('touchstart',e=>tx=e.touches[0].clientX,{passive:true});
+slidesEl.addEventListener('touchend',e=>{ const dx=e.changedTouches[0].clientX-tx;
+  if(Math.abs(dx)>50){ dx<0?next():prev(); } },{passive:true});
+
+/* ============================================================
+   INTERACTIVOS
+   ============================================================ */
+const ETAPAS = [
+  ["Descontaminación intrapabellón","Retirar restos en pabellón y <b>evitar el suero fisiológico</b>: los cloruros corroen el acero."],
+  ["Recepción y registro","Verificar inventario, integridad e identificación, y <b>registrar en trazabilidad</b> (obligatorio)."],
+  ["Lavado y termodesinfección","Detergente enzimático, ultrasonido y termodesinfectora (Norma N°199) con <b>agua osmotizada</b>."],
+  ["Inspección y lubricación","Revisión <b>bajo lupa</b>: limpieza, integridad, funcionalidad y lubricación de articulaciones."],
+  ["Preparación y empaque","Empaque según vigencia (<b>3, 6 o 12 meses</b>) y etiquetado con número de lote."],
+  ["Esterilización","Autoclave (vapor), peróxido de hidrógeno u óxido de etileno según el material."],
+  ["Controles de calidad","Indicadores <b>físicos, químicos y biológicos</b> que validan cada ciclo."],
+  ["Almacenamiento y distribución","Condiciones controladas (18–24°C), humedad 30–50%, orden <b>FIFO</b> y empaque íntegro."],
+  ["Entrega y trazabilidad","Hoja de intercambio firmada y registro completo de quién, cuándo y a qué cliente."]
+];
+function buildFlow(){
+  const f = document.getElementById('flow'); if(!f || f.dataset.built) return; f.dataset.built=1;
+  ETAPAS.forEach((e,i)=>{
+    const s=document.createElement('div'); s.className='step';
+    s.innerHTML=`<div class="n">${i+1}</div><span>${e[0].split(' ').slice(0,2).join(' ')}</span>`;
+    s.onclick=()=>{ document.querySelectorAll('#flow .step').forEach(x=>x.classList.remove('on'));
+      s.classList.add('on'); document.getElementById('flowDetail').innerHTML=`<b>${i+1}. ${e[0]}</b> — ${e[1]}`; };
+    f.appendChild(s);
+  });
+}
+
+const EMP = [
+  ["Papel polipropileno simple","1 mes"],
+  ["Papel polipropileno doble","3 meses"],
+  ["Un papel polipropileno + Pouche","3 meses"],
+  ["Envoltorio Pouche (bilaminado) simple","6 meses"],
+  ["Envoltorio Pouche (bilaminado) doble","12 meses"]
+];
+function buildEmpaque(){
+  const row=document.getElementById('empRow'); if(!row || row.dataset.built) return; row.dataset.built=1;
+  EMP.forEach((e,i)=>{
+    const b=document.createElement('button'); b.className='empBtn'; b.textContent=e[0];
+    b.onclick=()=>{ document.querySelectorAll('#empRow .empBtn').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');
+      const out=document.getElementById('empOut');
+      out.innerHTML=`<div class="big">${e[1]}</div><div class="lbl">${e[0]}</div>`; };
+    row.appendChild(b);
+  });
+}
+
+const CLASES=[
+  ["Clase 1","Indicador de proceso","Solo demuestra exposición al procedimiento."],
+  ["Clase 2","Test Bowie-Dick","Verifica la eficiencia del sistema de remoción de aire."],
+  ["Clase 3","Un solo parámetro","Responde a una variable crítica del proceso."],
+  ["Clase 4","Multiparámetros","Responde a dos o más variables (tiempo + temperatura)."],
+  ["Clase 5","Integrador","Responde a TODAS las variables: tiempo, presión, humedad y temperatura."],
+  ["Clase 6","Emulador","Reacciona a todas las variables de un ciclo específico (ej: priones 134°C/18min)."]
+];
+function buildClases(){
+  const g=document.getElementById('clsGrid'); if(!g || g.dataset.built) return; g.dataset.built=1;
+  CLASES.forEach(c=>{
+    const card=document.createElement('div'); card.className='clsCard';
+    card.innerHTML=`<div class="tag">${c[0]}</div><h3>${c[1]}</h3><div class="desc">${c[2]}</div>`;
+    card.onclick=()=>card.classList.toggle('on');
+    g.appendChild(card);
+  });
+}
+
+function buildContainers(){
+  const r=document.getElementById('contRed'), b=document.getElementById('contBlue');
+  if(!r||r.dataset.built) return; r.dataset.built=1;
+  const toggle=(el,other)=>{ el.style.transform='scale(1.04)'; el.style.boxShadow='0 16px 40px rgba(0,0,0,.3)';
+    other.style.transform='scale(.97)'; other.style.opacity='.7'; setTimeout(()=>{ other.style.opacity='1'; },1200); };
+  r.onclick=()=>toggle(r,b); b.onclick=()=>toggle(b,r);
+}
+
+/* init */
+render(0);
+</script>
+</body>
+</html>
