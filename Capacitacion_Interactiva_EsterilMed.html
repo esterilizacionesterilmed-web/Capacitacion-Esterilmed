@@ -375,13 +375,13 @@ S.push({ crumb:"Etapa 3", html:`
   <div class="grid2">
     <div>
       <div class="check rv"><div class="b">1</div><p>Desmontar todo el instrumental articulado.</p></div>
-      <div class="check rv"><div class="b">2</div><p>Prelavado con detergente enzimático: <b>5–10 min</b>.</p></div>
+      <div class="check rv"><div class="b">2</div><p>Prelavado con detergente enzimático (Triplenzimatic®): <b>3–5 min</b>, temperatura 37–55°C.</p></div>
       <div class="check rv"><div class="b">3</div><p>Cepillar cremalleras, uniones y estrías con hisopo.</p></div>
       <div class="check rv"><div class="b">4</div><p>Lavar canulados con hisopo y lavadora vaporizadora ELMA.</p></div>
     </div>
     <div>
       <div class="check rv"><div class="b">5</div><p>Lavadora ultrasónica: <b>10 min</b>.</p></div>
-      <div class="check rv"><div class="b">6</div><p>Termodesinfectora: <b>1 h 20 min</b> (Norma N°199).</p></div>
+      <div class="check rv"><div class="b">6</div><p>Termodesinfectora: <b>1 h 20 min</b>.</p></div>
       <div class="check rv"><div class="b">7</div><p>Enjuague final con <b>agua osmotizada</b> (pura, baja en minerales).</p></div>
     </div>
   </div>
@@ -486,9 +486,9 @@ S.push({ crumb:"Controles biológicos", html:`
   <h1 class="kicker">El control más exigente</h1>
   <h2>Indicadores biológicos</h2>
   <div class="grid3">
-    <div class="card rv"><h3>Autoclave — Vapor</h3><p><b>20 min</b><br>Espora: <i>Geobacillus stearothermophilus</i></p></div>
-    <div class="card rv"><h3>Peróxido de Hidrógeno</h3><p><b>20 min</b><br>Espora: <i>Geobacillus stearothermophilus</i></p></div>
-    <div class="card rv"><h3>Óxido de Etileno</h3><p><b>20 min</b><br>Espora: <i>Bacillus atrophaeus</i></p></div>
+    <div class="card rv"><h3>Autoclave — Vapor</h3><p><b>24 min</b><br>Espora: <i>Geobacillus stearothermophilus</i></p></div>
+    <div class="card rv"><h3>Peróxido de Hidrógeno</h3><p><b>24 min</b><br>Espora: <i>Geobacillus stearothermophilus</i></p></div>
+    <div class="card rv"><h3>Óxido de Etileno</h3><p><b>24 min</b><br>Espora: <i>Bacillus atrophaeus</i></p></div>
   </div>
   <div class="note rv"><div class="ic">📋</div><div>Esporas impregnadas + ampolleta con medio de cultivo (fluorescencia/pH). Uso <b>obligatorio</b> en implantes, reparación/mantención de equipos y <b>semanalmente</b> como control de rutina (Norma N°199).</div></div>
 `, reveal:true });
@@ -498,7 +498,7 @@ S.push({ crumb:"Etapa 7", html:`
   <h1 class="kicker">Etapa 7</h1>
   <h2><span class="num">7.</span> Almacenamiento y distribución</h2>
   <div class="grid2">
-    <div class="card rv"><h3>🌡️ Temperatura</h3><p>Controlada entre <b>18°C y 22°C</b>, en ambiente libre de humedad.</p></div>
+    <div class="card rv"><h3>🌡️ Temperatura</h3><p>Controlada entre <b>18°C y 24°C</b>, humedad 30–50%.</p></div>
     <div class="card rv"><h3>💨 Circulación de aire</h3><p>Rejillas limpias, separadas <b>al menos 30 cm del piso</b> y alejadas de muros.</p></div>
     <div class="card rv"><h3>🔄 Orden FIFO</h3><p>Lo primero que vence, primero que se utiliza. Verificar siempre la fecha de vencimiento.</p></div>
     <div class="card rv"><h3>📦 Empaque íntegro</h3><p>Empaque roto, húmedo o sin viraje del indicador = <b>material NO estéril</b>.</p></div>
@@ -532,7 +532,7 @@ S.push({ crumb:"Tiempos", html:`
   <h2>Duración del proceso completo</h2>
   <div class="tl">
     <div class="tlPhase rv"><h3>Fase 1 — Lavado y descontaminación</h3>
-      <div class="tlBar"><span class="tlSeg">Prelavado 5–10'</span><span class="tlSeg">Ultrasonido 10'</span><span class="tlSeg">Enjuague 5'</span><span class="tlSeg">Termodesinfectora 1h20'</span><span class="tlSeg tot">≈ 1h 50min</span></div></div>
+      <div class="tlBar"><span class="tlSeg">Prelavado 3–5'</span><span class="tlSeg">Ultrasonido 10'</span><span class="tlSeg">Enjuague 5'</span><span class="tlSeg">Termodesinfectora 1h20'</span><span class="tlSeg tot">≈ 1h 50min</span></div></div>
     <div class="tlPhase rv"><h3>Fase 2 — Inspección, armado y empaque</h3>
       <div class="tlBar"><span class="tlSeg">Inspección · Lubricación · Armado · Empaque · Etiquetado</span><span class="tlSeg tot">≈ 30min</span></div></div>
     <div class="tlPhase rv"><h3>Fase 3 — Esterilización y enfriamiento</h3>
@@ -680,7 +680,7 @@ const ETAPAS = [
   ["Preparación y empaque","Empaque según vigencia (<b>3, 6 o 12 meses</b>) y etiquetado con número de lote."],
   ["Esterilización","Autoclave (vapor), peróxido de hidrógeno u óxido de etileno según el material."],
   ["Controles de calidad","Indicadores <b>físicos, químicos y biológicos</b> que validan cada ciclo."],
-  ["Almacenamiento y distribución","Condiciones controladas (18–22°C), orden <b>FIFO</b> y empaque íntegro."],
+  ["Almacenamiento y distribución","Condiciones controladas (18–24°C), humedad 30–50%, orden <b>FIFO</b> y empaque íntegro."],
   ["Entrega y trazabilidad","Hoja de intercambio firmada y registro completo de quién, cuándo y a qué cliente."]
 ];
 function buildFlow(){
@@ -695,11 +695,11 @@ function buildFlow(){
 }
 
 const EMP = [
-  ["1 envoltorio papel crepado","3 meses"],
-  ["Contenedor con porta-filtros","3 meses"],
-  ["2 envoltorios papel crepado","6 meses"],
-  ["1 envoltorio mixto (bilaminado)","6 meses"],
-  ["2 envoltorios papel mixto","12 meses"]
+  ["Papel polipropileno simple","1 mes"],
+  ["Papel polipropileno doble","3 meses"],
+  ["Un papel polipropileno + Pouche","3 meses"],
+  ["Envoltorio Pouche (bilaminado) simple","6 meses"],
+  ["Envoltorio Pouche (bilaminado) doble","12 meses"]
 ];
 function buildEmpaque(){
   const row=document.getElementById('empRow'); if(!row || row.dataset.built) return; row.dataset.built=1;
