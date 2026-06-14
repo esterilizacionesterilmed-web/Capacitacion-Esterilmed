@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EsterilMed · Evaluación de Servicio</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f0f4f8;
+  color: #222;
+  min-height: 100vh;
+}
+/* HEADER */
+.header {
+  background: #083B6F;
+  color: white;
+  padding: 0;
+  display: flex;
+  align-items: stretch;
+}
+.header-logo {
+  background: white;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+}
+.header-logo img { height: 52px; }
+.header-text {
+  padding: 14px 24px;
+  flex: 1;
+}
+.header-text h1 { font-size: 1.15rem; font-weight: 700; margin-bottom: 2px; }
+.header-text p { font-size: 0.78rem; color: #D0E6F5; }
+
+/* TABS */
+.tabs {
+  background: #1F4E79;
+  display: flex;
+  gap: 0;
+  padding: 0 24px;
+}
+.tab-btn {
+  background: none;
+  border: none;
+  color: #D0E6F5;
+  padding: 12px 20px;
+  font-size: 0.88rem;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  font-family: Arial, sans-serif;
+  transition: all 0.15s;
+}
+.tab-btn:hover { color: white; background: rgba(255,255,255,0.08); }
+.tab-btn.active { color: white; border-bottom-color: #D0E6F5; font-weight: 700; }
+
+/* CONTENT */
+.content { max-width: 860px; margin: 0 auto; padding: 28px 20px; }
+
+/* FORM */
+.form-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.09);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.form-section-title {
+  background: #083B6F;
+  color: white;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+.form-body { padding: 20px; }
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group label { font-size: 0.82rem; font-weight: 700; color: #083B6F; }
+.form-group input, .form-group select, .form-group textarea {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 0.88rem;
+  font-family: Arial, sans-serif;
+  color: #222;
+  transition: border 0.15s;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  outline: none;
+  border-color: #2E75B6;
+}
+.form-group textarea { resize: vertical; min-height: 70px; }
+.form-group.full { grid-column: 1 / -1; }
+
+/* RATING TABLE */
+.rating-table { width: 100%; border-collapse: collapse; }
+.rating-table thead th {
+  background: #D0E6F5;
+  color: #083B6F;
+  font-size: 0.8rem;
+  padding: 8px 10px;
+  text-align: center;
+}
+.rating-table thead th:first-child { text-align: left; }
+.rating-table tbody tr:nth-child(even) { background: #f8fafd; }
+.rating-table tbody td {
+  padding: 9px 10px;
+  font-size: 0.83rem;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+.rating-table tbody td:first-child { color: #444; }
+.rating-num { font-weight: 700; color: #083B6F; margin-right: 6px; }
+.radio-group { display: flex; justify-content: center; gap: 10px; }
+.radio-group input[type="radio"] { display: none; }
+.radio-group label {
+  width: 30px; height: 30px;
+  border: 2px solid #2E75B6;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 700;
+  color: #2E75B6;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+.radio-group input[type="radio"]:checked + label {
+  background: #083B6F;
+  border-color: #083B6F;
+  color: white;
+}
+.radio-group label:hover { background: #D0E6F5; }
+
+/* RECOMMEND */
+.recommend-group { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.recommend-group label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.88rem; cursor: pointer;
+}
+.recommend-group input[type="radio"] { accent-color: #083B6F; }
+
+/* SUBMIT */
+.btn-submit {
+  background: #083B6F;
+  color: white;
+  border: none;
+  padding: 13px 36px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  transition: background 0.15s;
+  width: 100%;
+  margin-top: 8px;
+}
+.btn-submit:hover { background: #1F4E79; }
+.btn-submit:disabled { background: #aaa; cursor: not-allowed; }
+
+/* ALERT */
+.alert {
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  margin-bottom: 16px;
+  display: none;
+}
+.alert.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.alert.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+/* RESPONSES TAB */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: white;
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border-top: 4px solid #083B6F;
+}
+.stat-card .num { font-size: 1.8rem; font-weight: 700; color: #083B6F; }
+.stat-card .lbl { font-size: 0.75rem; color: #666; margin-top: 4px; }
+
+.filter-bar {
+  background: white;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+.filter-bar .form-group { min-width: 160px; }
+.btn-secondary {
+  background: white;
+  color: #083B6F;
+  border: 2px solid #083B6F;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  transition: all 0.15s;
+}
+.btn-secondary:hover { background: #083B6F; color: white; }
+.btn-danger {
+  background: white;
+  color: #c00;
+  border: 2px solid #c00;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+}
+.btn-danger:hover { background: #c00; color: white; }
+
+.responses-list { display: flex; flex-direction: column; gap: 14px; }
+.response-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+.response-header {
+  background: #083B6F;
+  color: white;
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+.response-header strong { font-size: 0.95rem; }
+.response-body { padding: 14px 16px; }
+.score-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.score-pill {
+  background: #D0E6F5;
+  color: #083B6F;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.score-pill.highlight { background: #083B6F; color: white; }
+.response-comments { font-size: 0.82rem; color: #555; line-height: 1.5; }
+.response-comments span { font-weight: 700; color: #083B6F; }
+.btn-delete-card {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.5);
+  color: white;
+  padding: 3px 10px;
+  border-radius: 5px;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.btn-delete-card:hover { background: rgba(255,255,255,0.2); }
+
+/* CHART AREA */
+.chart-card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  margin-bottom: 20px;
+}
+.chart-card h3 { color: #083B6F; font-size: 0.95rem; margin-bottom: 14px; }
+
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+  color: #999;
+}
+.empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+.empty-state p { font-size: 0.9rem; }
+
+/* TABS CONTENT */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 0.75rem;
+  color: #888;
+  margin-top: 20px;
+}
+
+@media (max-width: 600px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .header-text h1 { font-size: 0.95rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">
+    <img src="https://i.ibb.co/GfhTWyMV/logo.jpg" alt="EsterilMed" onerror="this.style.display='none'">
+  </div>
+  <div class="header-text">
+    <h1>Evaluación de Servicio · EsterilMed SpA</h1>
+    <p>Registro digital de encuestas de satisfacción de clientes</p>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('form')">📝 Nueva Evaluación</button>
+  <button class="tab-btn" onclick="showTab('responses')">📋 Respuestas</button>
+  <button class="tab-btn" onclick="showTab('analysis')">📊 Análisis</button>
+</div>
+
+<!-- TAB: FORM -->
+<div id="tab-form" class="tab-panel active">
+<div class="content">
+  <div id="alert-box" class="alert"></div>
+
+  <!-- DATOS DEL EVALUADOR -->
+  <div class="form-card">
+    <div class="form-section-title">DATOS DEL EVALUADOR</div>
+    <div class="form-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Institución *</label>
+          <select id="f-institucion">
+            <option value="">Seleccione institución...</option>
+            <optgroup label="Hospitales">
+              <option>Hospital Padre Hurtado</option>
+              <option>Hospital Sótero del Río</option>
+              <option>Hospital de Til Til</option>
+              <option>Hospital Lucio Córdoba</option>
+              <option>Hospital Parroquial San Bernardo</option>
+              <option>Posta Central</option>
+              <option>Instituto del Cáncer</option>
+            </optgroup>
+            <optgroup label="Clínicas">
+              <option>Clínica Dávila Vespucio</option>
+              <option>Clínica Indisa Maipú</option>
+              <option>Clínica Indisa Providencia</option>
+              <option>Clínica Colonial</option>
+              <option>Clínica Kennedy</option>
+            </optgroup>
+            <optgroup label="Otras instituciones">
+              <option>CAPREDENA</option>
+              <option>CAAK</option>
+              <option>AETICA</option>
+              <option>ESACH</option>
+              <option>Gliocorp</option>
+              <option>Otra institución</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Nombre del evaluador *</label>
+          <input type="text" id="f-nombre" placeholder="Nombre completo">
+        </div>
+        <div class="form-group">
+          <label>Cargo</label>
+          <input type="text" id="f-cargo" placeholder="Ej: Enfermera Jefe de Pabellón">
+        </div>
+        <div class="form-group">
+          <label>Fecha *</label>
+          <input type="date" id="f-fecha">
+        </div>
+      </div>
+      <div id="otra-inst-wrap" class="form-group" style="display:none; margin-top:8px;">
+        <label>Especifique institución</label>
+        <input type="text" id="f-otra-inst" placeholder="Nombre de la institución">
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN I -->
+  <div class="form-card">
+    <div class="form-section-title">I. Calidad del Proceso de Esterilización</div>
+    <div class="form-body">
+      <table class="rating-table">
+        <thead>
+          <tr>
+            <th>Criterio</th>
+            <th>1<br><small>Muy malo</small></th>
+            <th>2<br><small>Malo</small></th>
+            <th>3<br><small>Regular</small></th>
+            <th>4<br><small>Bueno</small></th>
+            <th>5<br><small>Excelente</small></th>
+          </tr>
+        </thead>
+        <tbody id="tbody-s1"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECCIÓN II -->
+  <div class="form-card">
+    <div class="form-section-title">II. Puntualidad y Tiempo de Respuesta</div>
+    <div class="form-body">
+      <table class="rating-table">
+        <thead>
+          <tr>
+            <th>Criterio</th>
+            <th>1<br><small>Muy malo</small></th>
+            <th>2<br><small>Malo</small></th>
+            <th>3<br><small>Regular</small></th>
+            <th>4<br><small>Bueno</small></th>
+            <th>5<br><small>Excelente</small></th>
+          </tr>
+        </thead>
+        <tbody id="tbody-s2"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECCIÓN III -->
+  <div class="form-card">
+    <div class="form-section-title">III. Comunicación y Trato del Personal</div>
+    <div class="form-body">
+      <table class="rating-table">
+        <thead>
+          <tr>
+            <th>Criterio</th>
+            <th>1<br><small>Muy malo</small></th>
+            <th>2<br><small>Malo</small></th>
+            <th>3<br><small>Regular</small></th>
+            <th>4<br><small>Bueno</small></th>
+            <th>5<br><small>Excelente</small></th>
+          </tr>
+        </thead>
+        <tbody id="tbody-s3"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECCIÓN IV -->
+  <div class="form-card">
+    <div class="form-section-title">IV. Evaluación Global</div>
+    <div class="form-body">
+      <table class="rating-table">
+        <thead>
+          <tr>
+            <th>Criterio</th>
+            <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-s4"></tbody>
+      </table>
+      <div style="margin-top:18px;">
+        <div class="form-group" style="margin-bottom:10px;">
+          <label>¿Recomendaría EsterilMed SpA a otras instituciones?</label>
+          <div class="recommend-group" style="margin-top:8px;">
+            <label><input type="radio" name="recomienda" value="Sí"> Sí</label>
+            <label><input type="radio" name="recomienda" value="No"> No</label>
+            <label><input type="radio" name="recomienda" value="Probablemente"> Probablemente</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMENTARIOS -->
+  <div class="form-card">
+    <div class="form-section-title">V. Comentarios y Sugerencias</div>
+    <div class="form-body">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>¿Qué aspectos del servicio destaca como fortalezas?</label>
+          <textarea id="f-fortalezas" placeholder="Escriba aquí..."></textarea>
+        </div>
+        <div class="form-group full">
+          <label>¿Qué aspectos necesitan mejorar?</label>
+          <textarea id="f-mejoras" placeholder="Escriba aquí..."></textarea>
+        </div>
+        <div class="form-group full">
+          <label>Observaciones adicionales o sugerencias</label>
+          <textarea id="f-observaciones" placeholder="Escriba aquí..."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-submit" id="btn-guardar" onclick="guardarEvaluacion()">💾 Guardar Evaluación</button>
+</div>
+</div>
+
+<!-- TAB: RESPONSES -->
+<div id="tab-responses" class="tab-panel">
+<div class="content">
+  <div class="stats-grid" id="stats-grid"></div>
+  <div class="filter-bar">
+    <div class="form-group">
+      <label>Filtrar por institución</label>
+      <select id="filtro-inst" onchange="renderResponses()">
+        <option value="">Todas</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Filtrar por mes</label>
+      <select id="filtro-mes" onchange="renderResponses()">
+        <option value="">Todos</option>
+      </select>
+    </div>
+    <button class="btn-secondary" onclick="exportarExcel()">📥 Exportar Excel</button>
+    <button class="btn-danger" onclick="limpiarTodo()">🗑️ Eliminar todo</button>
+  </div>
+  <div class="responses-list" id="responses-list"></div>
+</div>
+</div>
+
+<!-- TAB: ANALYSIS -->
+<div id="tab-analysis" class="tab-panel">
+<div class="content">
+  <div id="analysis-content"></div>
+</div>
+</div>
+
+<footer>EsterilMed SpA · Francisco Lobos 874, Quinta Normal, Santiago · Directora Técnica: Marjorie Miranda G.<br>
+Creado por Marjorie Miranda G. · Directora Técnica</footer>
+
+<script>
+// ── PREGUNTAS ─────────────────────────────────────────────────────────────────
+const PREGUNTAS = [
+  { sec: 1, n: 1,  txt: 'Material procesado llega sin daños y correctamente embalado.' },
+  { sec: 1, n: 2,  txt: 'Paquetes sellados, etiquetados y con indicadores de proceso visibles.' },
+  { sec: 1, n: 3,  txt: 'Los indicadores biológicos y/o químicos reflejan el proceso correcto.' },
+  { sec: 1, n: 4,  txt: 'Los insumos procesados cumplen con los estándares de calidad esperados.' },
+  { sec: 1, n: 5,  txt: 'La trazabilidad de los materiales es clara y verificable.' },
+  { sec: 2, n: 6,  txt: 'El retiro de materiales se realiza en los horarios acordados.' },
+  { sec: 2, n: 7,  txt: 'La entrega del material esterilizado cumple los plazos establecidos.' },
+  { sec: 2, n: 8,  txt: 'Ante urgencias, la respuesta es oportuna y eficiente.' },
+  { sec: 2, n: 9,  txt: 'Los tiempos de proceso son consistentes (retiro → entrega) y predecibles.' },
+  { sec: 3, n: 10, txt: 'El personal de retiro y entrega se presenta con actitud profesional y cordial.' },
+  { sec: 3, n: 11, txt: 'Las comunicaciones sobre avisos o cambios son claras y oportunas.' },
+  { sec: 3, n: 12, txt: 'Los reclamos o consultas se resuelven de forma rápida y satisfactoria.' },
+  { sec: 3, n: 13, txt: 'La coordinadora es accesible y resuelve dudas de forma efectiva.' },
+  { sec: 3, n: 14, txt: 'La relación general con el equipo EsterilMed es fluida y colaborativa.' },
+  { sec: 4, n: 15, txt: 'En términos generales, ¿cómo evalúa el servicio global de EsterilMed?' },
+];
+
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw4M4LJcobvrO1pRXQnvnJ_awqQZ3rimJAc-DPs8_P2F0wF4TnBcBe7eeDrJbmJ2lYQ/exec';
+const LS_KEY = 'esterilmed_evaluaciones';
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+window.onload = () => {
+  document.getElementById('f-fecha').value = new Date().toISOString().split('T')[0];
+  document.getElementById('f-institucion').addEventListener('change', function() {
+    document.getElementById('otra-inst-wrap').style.display = this.value === 'Otra institución' ? 'block' : 'none';
+  });
+  buildTable('tbody-s1', 1);
+  buildTable('tbody-s2', 2);
+  buildTable('tbody-s3', 3);
+  buildTable('tbody-s4', 4);
+  populateFilters();
+  renderStats();
+};
+
+function buildTable(tbodyId, sec) {
+  const tbody = document.getElementById(tbodyId);
+  const qs = PREGUNTAS.filter(p => p.sec === sec);
+  qs.forEach(p => {
+    const tr = document.createElement('tr');
+    const tdTxt = document.createElement('td');
+    tdTxt.innerHTML = `<span class="rating-num">${p.n}.</span>${p.txt}`;
+    tr.appendChild(tdTxt);
+    for (let v = 1; v <= 5; v++) {
+      const td = document.createElement('td');
+      td.innerHTML = `<div class="radio-group">
+        <input type="radio" name="p${p.n}" id="p${p.n}v${v}" value="${v}">
+        <label for="p${p.n}v${v}">${v}</label>
+      </div>`;
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  });
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (name === 'responses') { populateFilters(); renderResponses(); renderStats(); }
+  if (name === 'analysis') renderAnalysis();
+}
+
+// ── LOCAL STORAGE ─────────────────────────────────────────────────────────────
+function getEvals() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch { return []; }
+}
+function saveEvals(arr) { localStorage.setItem(LS_KEY, JSON.stringify(arr)); }
+
+// ── GUARDAR ───────────────────────────────────────────────────────────────────
+async function guardarEvaluacion() {
+  const inst = document.getElementById('f-institucion').value;
+  const otraInst = document.getElementById('f-otra-inst').value.trim();
+  const nombre = document.getElementById('f-nombre').value.trim();
+  const fecha = document.getElementById('f-fecha').value;
+
+  if (!inst || !nombre || !fecha) {
+    showAlert('Por favor complete los campos obligatorios: Institución, Nombre y Fecha.', 'error');
+    return;
+  }
+
+  const puntajes = {};
+  let completo = true;
+  PREGUNTAS.forEach(p => {
+    const sel = document.querySelector(`input[name="p${p.n}"]:checked`);
+    if (!sel) completo = false;
+    else puntajes[`P${p.n}`] = parseInt(sel.value);
+  });
+
+  if (!completo) {
+    showAlert('Por favor responda todas las preguntas antes de guardar.', 'error');
+    return;
+  }
+
+  const recomienda = document.querySelector('input[name="recomienda"]:checked');
+
+  const s1 = avg([1,2,3,4,5].map(n => puntajes[`P${n}`]));
+  const s2 = avg([6,7,8,9].map(n => puntajes[`P${n}`]));
+  const s3 = avg([10,11,12,13,14].map(n => puntajes[`P${n}`]));
+  const global = puntajes['P15'];
+  const promGeneral = avg([s1, s2, s3, global]);
+
+  const data = {
+    timestamp: new Date().toLocaleString('es-CL'),
+    institucion: inst === 'Otra institución' ? otraInst || 'Otra' : inst,
+    nombre,
+    cargo: document.getElementById('f-cargo').value.trim(),
+    fecha,
+    ...puntajes,
+    global,
+    recomienda: recomienda ? recomienda.value : '',
+    fortalezas: document.getElementById('f-fortalezas').value.trim(),
+    mejoras: document.getElementById('f-mejoras').value.trim(),
+    observaciones: document.getElementById('f-observaciones').value.trim(),
+    prom_s1: s1.toFixed(2),
+    prom_s2: s2.toFixed(2),
+    prom_s3: s3.toFixed(2),
+    prom_general: promGeneral.toFixed(2),
+  };
+
+  // Guardar local
+  const evals = getEvals();
+  evals.push(data);
+  saveEvals(evals);
+
+  // Enviar a Google Sheets
+  const btn = document.getElementById('btn-guardar');
+  btn.disabled = true;
+  btn.textContent = '⏳ Guardando...';
+
+  try {
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = APPS_SCRIPT_URL;
+    form.target = iframe.name = 'submit_' + Date.now();
+    Object.entries(data).forEach(([k, v]) => {
+      const input = document.createElement('input');
+      input.type = 'hidden'; input.name = k; input.value = v;
+      form.appendChild(input);
+    });
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(() => {
+      document.body.removeChild(form);
+      document.body.removeChild(iframe);
+    }, 3000);
+  } catch(e) {}
+
+  showAlert('✅ Evaluación guardada correctamente.', 'success');
+  resetForm();
+  btn.disabled = false;
+  btn.textContent = '💾 Guardar Evaluación';
+}
+
+function avg(arr) { return arr.reduce((a, b) => a + b, 0) / arr.length; }
+
+function resetForm() {
+  document.getElementById('f-nombre').value = '';
+  document.getElementById('f-cargo').value = '';
+  document.getElementById('f-institucion').value = '';
+  document.getElementById('f-fecha').value = new Date().toISOString().split('T')[0];
+  document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+  document.getElementById('f-fortalezas').value = '';
+  document.getElementById('f-mejoras').value = '';
+  document.getElementById('f-observaciones').value = '';
+  document.getElementById('otra-inst-wrap').style.display = 'none';
+}
+
+function showAlert(msg, type) {
+  const el = document.getElementById('alert-box');
+  el.textContent = msg;
+  el.className = 'alert ' + type;
+  el.style.display = 'block';
+  window.scrollTo(0, 0);
+  setTimeout(() => el.style.display = 'none', 5000);
+}
+
+// ── STATS ─────────────────────────────────────────────────────────────────────
+function renderStats() {
+  const evals = getEvals();
+  const total = evals.length;
+  const promG = total ? avg(evals.map(e => parseFloat(e.prom_general))).toFixed(2) : '-';
+  const insts = new Set(evals.map(e => e.institucion)).size;
+  const recSi = evals.filter(e => e.recomienda === 'Sí').length;
+  const pctRec = total ? Math.round(recSi / total * 100) : 0;
+
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat-card"><div class="num">${total}</div><div class="lbl">Evaluaciones totales</div></div>
+    <div class="stat-card"><div class="num">${promG}</div><div class="lbl">Promedio general (/5)</div></div>
+    <div class="stat-card"><div class="num">${insts}</div><div class="lbl">Instituciones evaluadoras</div></div>
+    <div class="stat-card"><div class="num">${pctRec}%</div><div class="lbl">Recomendarían EsterilMed</div></div>
+  `;
+}
+
+// ── FILTROS ───────────────────────────────────────────────────────────────────
+function populateFilters() {
+  const evals = getEvals();
+  const insts = [...new Set(evals.map(e => e.institucion))].sort();
+  const meses = [...new Set(evals.map(e => e.fecha ? e.fecha.substring(0, 7) : ''))].filter(Boolean).sort().reverse();
+  const selInst = document.getElementById('filtro-inst');
+  const selMes = document.getElementById('filtro-mes');
+  const curInst = selInst.value, curMes = selMes.value;
+  selInst.innerHTML = '<option value="">Todas</option>' + insts.map(i => `<option ${i===curInst?'selected':''}>${i}</option>`).join('');
+  selMes.innerHTML = '<option value="">Todos</option>' + meses.map(m => `<option ${m===curMes?'selected':''}>${m}</option>`).join('');
+}
+
+// ── RENDER RESPONSES ──────────────────────────────────────────────────────────
+function renderResponses() {
+  const filtInst = document.getElementById('filtro-inst').value;
+  const filtMes = document.getElementById('filtro-mes').value;
+  let evals = getEvals();
+  if (filtInst) evals = evals.filter(e => e.institucion === filtInst);
+  if (filtMes) evals = evals.filter(e => e.fecha && e.fecha.startsWith(filtMes));
+
+  const container = document.getElementById('responses-list');
+  if (!evals.length) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>No hay evaluaciones registradas.</p></div>`;
+    return;
+  }
+
+  container.innerHTML = [...evals].reverse().map((e, idx) => {
+    const realIdx = getEvals().length - 1 - idx;
+    return `<div class="response-card">
+      <div class="response-header">
+        <div><strong>${e.institucion}</strong> · ${e.nombre} · ${e.cargo || ''}</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span>${e.fecha}</span>
+          <button class="btn-delete-card" onclick="eliminarEval(${realIdx})">Eliminar</button>
+        </div>
+      </div>
+      <div class="response-body">
+        <div class="score-row">
+          <span class="score-pill">Calidad: ${e.prom_s1}</span>
+          <span class="score-pill">Puntualidad: ${e.prom_s2}</span>
+          <span class="score-pill">Comunicación: ${e.prom_s3}</span>
+          <span class="score-pill highlight">⭐ Promedio: ${e.prom_general}</span>
+          ${e.recomienda ? `<span class="score-pill">Recomienda: ${e.recomienda}</span>` : ''}
+        </div>
+        ${e.fortalezas ? `<div class="response-comments"><span>Fortalezas:</span> ${e.fortalezas}</div>` : ''}
+        ${e.mejoras ? `<div class="response-comments"><span>Mejoras:</span> ${e.mejoras}</div>` : ''}
+        ${e.observaciones ? `<div class="response-comments"><span>Observaciones:</span> ${e.observaciones}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function eliminarEval(idx) {
+  if (!confirm('¿Eliminar esta evaluación?')) return;
+  const evals = getEvals();
+  evals.splice(idx, 1);
+  saveEvals(evals);
+  populateFilters();
+  renderStats();
+  renderResponses();
+}
+
+function limpiarTodo() {
+  if (!confirm('¿Eliminar TODAS las evaluaciones del registro local? (Los datos en Google Sheets no se eliminan.)')) return;
+  localStorage.removeItem(LS_KEY);
+  populateFilters();
+  renderStats();
+  renderResponses();
+}
+
+// ── ANÁLISIS ──────────────────────────────────────────────────────────────────
+let chartBar = null, chartRadar = null;
+
+function renderAnalysis() {
+  const evals = getEvals();
+  const container = document.getElementById('analysis-content');
+  if (!evals.length) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">📊</div><p>Ingrese evaluaciones para ver el análisis.</p></div>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="chart-card"><h3>Promedio por pregunta (P1–P15)</h3><canvas id="chart-bar" height="100"></canvas></div>
+    <div class="chart-card"><h3>Promedio por dimensión</h3><canvas id="chart-radar" height="120"></canvas></div>
+  `;
+
+  // Promedios por pregunta
+  const promPorP = PREGUNTAS.map(p => {
+    const vals = evals.map(e => e[`P${p.n}`]).filter(v => v != null).map(Number);
+    return vals.length ? avg(vals) : 0;
+  });
+
+  if (chartBar) chartBar.destroy();
+  chartBar = new Chart(document.getElementById('chart-bar'), {
+    type: 'bar',
+    data: {
+      labels: PREGUNTAS.map(p => `P${p.n}`),
+      datasets: [{
+        label: 'Promedio',
+        data: promPorP.map(v => v.toFixed(2)),
+        backgroundColor: promPorP.map(v => v >= 4 ? '#083B6F' : v >= 3 ? '#2E75B6' : '#e74c3c'),
+        borderRadius: 5,
+      }]
+    },
+    options: {
+      scales: { y: { min: 0, max: 5 } },
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  // Radar por dimensión
+  const dimAvg = [
+    avg(evals.map(e => avg([1,2,3,4,5].map(n => Number(e[`P${n}`]))))),
+    avg(evals.map(e => avg([6,7,8,9].map(n => Number(e[`P${n}`]))))),
+    avg(evals.map(e => avg([10,11,12,13,14].map(n => Number(e[`P${n}`]))))),
+    avg(evals.map(e => Number(e.P15))),
+  ];
+
+  if (chartRadar) chartRadar.destroy();
+  chartRadar = new Chart(document.getElementById('chart-radar'), {
+    type: 'radar',
+    data: {
+      labels: ['Calidad', 'Puntualidad', 'Comunicación', 'Global'],
+      datasets: [{
+        label: 'Promedio',
+        data: dimAvg.map(v => v.toFixed(2)),
+        backgroundColor: 'rgba(8,59,111,0.18)',
+        borderColor: '#083B6F',
+        pointBackgroundColor: '#083B6F',
+      }]
+    },
+    options: { scales: { r: { min: 0, max: 5 } } }
+  });
+}
+
+// ── EXPORTAR EXCEL ────────────────────────────────────────────────────────────
+function exportarExcel() {
+  const evals = getEvals();
+  if (!evals.length) { alert('No hay evaluaciones para exportar.'); return; }
+
+  const wb = XLSX.utils.book_new();
+
+  // Hoja 1: Datos completos
+  const headers = ['Timestamp','Institución','Nombre','Cargo','Fecha',
+    ...PREGUNTAS.map(p=>`P${p.n}`),'Global','Recomienda','Fortalezas','Mejoras','Observaciones',
+    'Prom. I','Prom. II','Prom. III','Prom. General'];
+  const rows = evals.map(e => [
+    e.timestamp, e.institucion, e.nombre, e.cargo, e.fecha,
+    ...PREGUNTAS.map(p => e[`P${p.n}`]),
+    e.global, e.recomienda, e.fortalezas, e.mejoras, e.observaciones,
+    e.prom_s1, e.prom_s2, e.prom_s3, e.prom_general
+  ]);
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([headers, ...rows]), 'Datos');
+
+  // Hoja 2: Resumen por institución
+  const insts = [...new Set(evals.map(e => e.institucion))];
+  const res2 = [['Institución','N° Evaluaciones','Prom. General','Recomienda Sí']];
+  insts.forEach(inst => {
+    const sub = evals.filter(e => e.institucion === inst);
+    const promG = avg(sub.map(e => parseFloat(e.prom_general))).toFixed(2);
+    const recSi = sub.filter(e => e.recomienda === 'Sí').length;
+    res2.push([inst, sub.length, promG, recSi]);
+  });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(res2), 'Por Institución');
+
+  // Hoja 3: Promedios por pregunta
+  const res3 = [['N°','Pregunta','Promedio']];
+  PREGUNTAS.forEach(p => {
+    const vals = evals.map(e => Number(e[`P${p.n}`])).filter(Boolean);
+    res3.push([p.n, p.txt, vals.length ? avg(vals).toFixed(2) : '-']);
+  });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(res3), 'Por Pregunta');
+
+  XLSX.writeFile(wb, 'Evaluaciones_EsterilMed.xlsx');
+}
+</script>
+</body>
+</html>
