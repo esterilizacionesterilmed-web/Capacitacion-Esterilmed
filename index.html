@@ -1,156 +1,140 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EsterilMed · Capacitación</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      min-height: 100vh;
-      background: linear-gradient(160deg, #083B6F 0%, #1a5fa8 60%, #D0E6F5 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-    .logo-wrap {
-      background: white;
-      border-radius: 16px;
-      padding: 18px 32px;
-      margin-bottom: 32px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.18);
-    }
-    .logo-wrap img { height: 64px; display: block; }
-    h1 {
-      color: white;
-      font-size: 1.5rem;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 8px;
-    }
-    p.sub {
-      color: #D0E6F5;
-      font-size: 0.95rem;
-      text-align: center;
-      margin-bottom: 24px;
-    }
-    .instrucciones {
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 12px;
-      padding: 16px 20px;
-      max-width: 480px;
-      width: 100%;
-      margin-bottom: 28px;
-    }
-    .instrucciones h3 {
-      color: white;
-      font-size: 0.85rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 10px;
-    }
-    .instrucciones ol {
-      padding-left: 18px;
-    }
-    .instrucciones ol li {
-      color: #D0E6F5;
-      font-size: 0.88rem;
-      line-height: 1.6;
-      margin-bottom: 4px;
-    }
-    .instrucciones ol li b {
-      color: white;
-    }
-    .cards {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      width: 100%;
-      max-width: 480px;
-    }
-    .card {
-      background: white;
-      border-radius: 16px;
-      padding: 28px 24px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.15);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      transition: transform 0.15s, box-shadow 0.15s;
-      border-left: 6px solid #083B6F;
-    }
-    .card:hover { transform: translateY(-3px); box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
-    .card .icon { font-size: 2.4rem; flex-shrink: 0; }
-    .card .info h2 { color: #083B6F; font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
-    .card .info p { color: #555; font-size: 0.85rem; line-height: 1.4; }
-    .card.plataforma { border-left-color: #2E75B6; }
-    .badge {
-      background: #083B6F;
-      color: white;
-      font-size: 0.7rem;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 20px;
-      margin-top: 6px;
-      display: inline-block;
-    }
-    .card.plataforma .badge { background: #2E75B6; }
-    footer {
-      color: #D0E6F5;
-      font-size: 0.78rem;
-      text-align: center;
-      margin-top: 40px;
-      opacity: 0.8;
-      line-height: 1.7;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EsterilMed SpA – Plataforma de Capacitación 2026</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Arial, sans-serif;
+    background: #E8ECF0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+  .card-header {
+    background: #4472C4;
+    padding: 22px 24px 20px;
+    border-radius: 12px 12px 0 0;
+  }
+  .card-header h1 { font-size: 1.45rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .card-header p { font-size: 12.5px; color: rgba(255,255,255,0.88); line-height: 1.6; }
+  .card-body { padding: 28px 28px 32px; }
+  .card-body h2 { font-size: 1.1rem; font-weight: 700; color: #3A5BA0; margin-bottom: 22px; }
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-size: 13px; color: #444; margin-bottom: 7px; }
+  .field input, .field select {
+    width: 100%; padding: 13px 16px;
+    border: 1.5px solid #D0D8E8; border-radius: 10px;
+    font-size: 15px; color: #333; background: #fff;
+    outline: none; transition: border-color .2s;
+    appearance: none; -webkit-appearance: none;
+  }
+  .field input::placeholder { color: #AAAAAA; }
+  .field input:focus, .field select:focus { border-color: #4472C4; }
+  .select-wrap { position: relative; }
+  .select-wrap::after {
+    content: '▾'; position: absolute; right: 14px; top: 50%;
+    transform: translateY(-50%); color: #666; pointer-events: none; font-size: 14px;
+  }
+  .select-wrap select { padding-right: 36px; color: #888; }
+  .select-wrap select.chosen { color: #333; }
+  .btn-start {
+    width: 100%; padding: 16px; background: #4472C4; color: #fff;
+    font-size: 16px; font-weight: 700; border: none; border-radius: 10px;
+    cursor: pointer; margin-top: 8px; transition: background .2s;
+  }
+  .btn-start:hover { background: #3561AE; }
+  .error-msg { font-size: 12px; color: #C62828; margin-top: 5px; display: none; }
+  .field.has-error input, .field.has-error select { border-color: #C62828; }
+  .field.has-error .error-msg { display: block; }
+  .page-footer { margin-top: 18px; font-size: 11px; color: #8899AA; text-align: center; }
+</style>
 </head>
 <body>
-  <div class="logo-wrap">
-    <img src="data:image/jpeg;base64,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" alt="EsterilMed">
+<div class="card">
+  <div class="card-header">
+    <h1>EsterilMed SpA</h1>
+    <p>Plataforma de Capacitación Interna · 2026<br>
+    Directora Técnica: Marjorie Miranda Gatica EU</p>
   </div>
-  <h1>Centro de Capacitación</h1>
-  <p class="sub">Servicio de Esterilización de Instrumental e Insumos Médicos</p>
-
-  <div class="instrucciones">
-    <h3>📋 Instrucciones de uso</h3>
-    <ol>
-      <li><b>Paso 1:</b> Revisa el <b>Material de Capacitación</b> completo.</li>
-      <li><b>Paso 2:</b> Ingresa a la <b>Plataforma de Evaluación</b> y completa los módulos.</li>
-      <li><b>Paso 3:</b> Rinde tu <b>evaluación</b> en la plataforma.</li>
-      <li><b>Paso 4:</b> Envía tu <b>certificado de aprobación</b> a la Directora Técnica.</li>
-    </ol>
-  </div>
-
-  <div class="cards">
-    <a class="card" href="Capacitacion_Interactiva_EsterilMed.html">
-      <div class="icon">📚</div>
-      <div class="info">
-        <h2>Material de Capacitación</h2>
-        <p>Contenido interactivo sobre procesos de esterilización y Norma N°199 MINSAL</p>
-        <span class="badge">PASO 1</span>
+  <div class="card-body">
+    <h2>Ingresar a capacitación</h2>
+    <div class="field" id="f-nombre">
+      <label>Nombre completo *</label>
+      <input type="text" id="nombre" placeholder="Ej: María González" autocomplete="off">
+      <div class="error-msg">Por favor ingresa tu nombre completo.</div>
+    </div>
+    <div class="field" id="f-area">
+      <label>Área de trabajo *</label>
+      <div class="select-wrap">
+        <select id="area" onchange="this.classList.add('chosen')">
+          <option value="" disabled selected>Seleccionar área...</option>
+          <option value="recepcion">Recepción</option>
+          <option value="descontaminacion">Descontaminación</option>
+          <option value="lavado">Lavado</option>
+          <option value="preparacion">Preparación y Empaque</option>
+          <option value="esterilizacion">Esterilización</option>
+          <option value="almacenamiento">Almacenamiento</option>
+          <option value="despacho">Despacho</option>
+          <option value="supervision">Supervisión</option>
+          <option value="transporte">Transporte</option>
+        </select>
       </div>
-    </a>
-    <a class="card plataforma" href="plataforma_capacitacion_esterilmed.html">
-      <div class="icon">🎓</div>
-      <div class="info">
-        <h2>Plataforma de Evaluación</h2>
-        <p>Módulos, evaluaciones con nota, certificados y registro de aprobación</p>
-        <span class="badge">PASO 2</span>
+      <div class="error-msg">Por favor selecciona tu área de trabajo.</div>
+    </div>
+    <div class="field" id="f-turno">
+      <label>Turno *</label>
+      <div class="select-wrap">
+        <select id="turno" onchange="this.classList.add('chosen')">
+          <option value="" disabled selected>Seleccionar turno...</option>
+          <option value="dia">Turno Día</option>
+          <option value="noche">Turno Noche</option>
+          <option value="part-time">Part Time</option>
+        </select>
       </div>
-    </a>
+      <div class="error-msg">Por favor selecciona tu turno.</div>
+    </div>
+    <button class="btn-start" onclick="comenzar()">▶ Comenzar capacitación</button>
   </div>
-
-  <footer>
-    EsterilMed SpA · Francisco Lobos 880, Quinta Normal, Santiago<br>
-    Directora Técnica: Marjorie Miranda G.<br>
-    Creado por Marjorie Miranda G. · Directora Técnica
-  </footer>
+</div>
+<div class="page-footer">
+  EsterilMed SpA · RUT 76.900.509-9 · Quinta Normal, Santiago<br>
+  Manual MN–EST–02 V1.0 · Norma Técnica N°199 MINSAL · Academia EsterilMed 2026
+</div>
+<script>
+function comenzar() {
+  const nombre = document.getElementById('nombre').value.trim();
+  const area   = document.getElementById('area').value;
+  const turno  = document.getElementById('turno').value;
+  let ok = true;
+  const fn = document.getElementById('f-nombre');
+  if (!nombre) { fn.classList.add('has-error'); ok = false; }
+  else { fn.classList.remove('has-error'); }
+  const fa = document.getElementById('f-area');
+  if (!area) { fa.classList.add('has-error'); ok = false; }
+  else { fa.classList.remove('has-error'); }
+  const ft = document.getElementById('f-turno');
+  if (!turno) { ft.classList.add('has-error'); ok = false; }
+  else { ft.classList.remove('has-error'); }
+  if (!ok) return;
+  sessionStorage.setItem('em_nombre', nombre);
+  sessionStorage.setItem('em_area', area);
+  sessionStorage.setItem('em_turno', turno);
+  window.location.href = 'modulos.html';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Enter') comenzar(); });
+</script>
 </body>
 </html>
