@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrega de Turno · EsterilMed SpA</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#1B3A6B;--blue:#2E75B6;--lb:#D9E2F3;--green:#2E7D32;--lg:#E8F5E9;--red:#C62828;--lr:#FFEBEE;--amber:#E65100;--la:#FFF3E0;--gray:#F5F5F5;--border:#E0E0E0;--text:#212121;--muted:#757575;--white:#fff}
+body{font-family:'Segoe UI',Arial,sans-serif;font-size:14px;color:var(--text);background:#F0F4F8;min-height:100vh}
+.app-header{background:var(--navy);color:white;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.app-header h1{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
+.app-header p{font-size:11px;opacity:.75;margin-top:2px}
+.chip{background:var(--blue);color:white;font-size:11px;padding:3px 10px;border-radius:20px}
+.progress-bar{background:white;border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center}
+.p-step{display:flex;align-items:center;gap:6px;flex:1}
+.p-dot{width:26px;height:26px;border-radius:50%;background:var(--border);color:var(--muted);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.p-dot.done{background:var(--blue);color:white}
+.p-dot.active{background:var(--navy);color:white;box-shadow:0 0 0 3px rgba(27,58,107,.2)}
+.p-label{font-size:11px;color:var(--muted);white-space:nowrap;display:none}
+@media(min-width:600px){.p-label{display:block}}
+.p-line{flex:1;height:1px;background:var(--border);margin:0 4px}
+.p-line.done{background:var(--blue)}
+.main{max-width:760px;margin:0 auto;padding:20px 16px 60px}
+.step{display:none}.step.active{display:block}
+.section{background:white;border-radius:10px;border:1px solid var(--border);padding:18px 20px;margin-bottom:14px}
+.stitle{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.stitle i{color:var(--blue);font-size:15px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:540px){.g2,.g3{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.field input,.field select,.field textarea{font-size:13px;padding:8px 10px;border-radius:6px;border:1px solid var(--border);background:white;color:var(--text);width:100%;transition:border-color .15s;font-family:inherit}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--blue)}
+.field textarea{resize:vertical;min-height:70px;line-height:1.5}
+.eq-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:480px){.eq-grid{grid-template-columns:1fr}}
+.eq-card{border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.eq-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px}
+.eq-btns{display:flex;gap:5px}
+.eq-btn{flex:1;font-size:10px;padding:5px 2px;border-radius:5px;border:1px solid var(--border);background:var(--gray);color:var(--muted);cursor:pointer;text-align:center;font-weight:500;transition:all .15s}
+.eq-btn.ok{background:var(--lg);border-color:#81C784;color:var(--green);font-weight:700}
+.eq-btn.falla{background:var(--lr);border-color:#EF9A9A;color:var(--red);font-weight:700}
+.eq-btn.mant{background:var(--la);border-color:#FFCC80;color:var(--amber);font-weight:700}
+.eq-obs{width:100%;margin-top:6px;font-size:11px;padding:4px 7px;border-radius:4px;border:1px solid var(--border);color:var(--text);font-family:inherit}
+.cnt-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #F0F0F0}
+.cnt-row:last-child{border-bottom:none}
+.cnt-label{flex:1;font-size:12px}
+.cnt-ctrl{display:flex;align-items:center;gap:6px}
+.cnt-btn{width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:white;color:var(--text);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;font-weight:500}
+.cnt-btn:hover{background:var(--lb)}
+.cnt-val{min-width:32px;text-align:center;font-size:14px;font-weight:700;color:var(--navy)}
+.cnt-obs{width:110px;font-size:11px;padding:4px 6px;border-radius:4px;border:1px solid var(--border);color:var(--text);font-family:inherit}
+.inc-row{display:grid;grid-template-columns:100px 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px}
+@media(max-width:540px){.inc-row{grid-template-columns:1fr 1fr}}
+.btn-del{background:none;border:none;color:#ccc;cursor:pointer;font-size:18px;padding:0 4px}
+.btn-del:hover{color:var(--red)}
+.btn-add-row{width:100%;font-size:12px;padding:7px;border:1px dashed var(--blue);border-radius:6px;background:none;color:var(--blue);cursor:pointer;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:4px}
+.btn-add-row:hover{background:var(--lb)}
+.pers-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid #F0F0F0;font-size:12px}
+.pers-row:last-child{border-bottom:none}
+.pers-btns{display:flex;gap:4px}
+.pill{padding:4px 9px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid transparent;transition:all .15s}
+.pill.pres{background:var(--lg);color:var(--green);border-color:#A5D6A7}
+.pill.aus{background:var(--lr);color:var(--red);border-color:#EF9A9A}
+.pill.lic{background:var(--lb);color:var(--navy);border-color:#90CAF9}
+.pill.inactive{opacity:.3}
+.obj-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #F0F0F0}
+.obj-row:last-child{border-bottom:none}
+.obj-label{flex:1;font-size:12px}
+.obj-btns{display:flex;gap:6px}
+.footer-nav{display:flex;gap:10px;margin-top:20px}
+.btn-back{padding:10px 16px;background:white;border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px}
+.btn-back:hover{background:var(--gray)}
+.btn-next{flex:1;padding:11px 16px;background:var(--navy);color:white;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-next:hover{background:#243f7a}
+.btn-preview{padding:11px 16px;background:var(--blue);color:white;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+.btn-preview:hover{background:#245d99}
+.btn-submit{flex:1;padding:11px 16px;background:var(--green);color:white;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-submit:hover{background:#1b5e20}
+.toast{position:fixed;bottom:24px;right:20px;background:#323232;color:white;padding:12px 18px;border-radius:8px;font-size:13px;display:none;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+#res-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;overflow-y:auto;padding:20px}
+.res-inner{background:white;max-width:780px;margin:0 auto;border-radius:10px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.res-hdr{background:var(--navy);color:white;padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+.res-hdr h2{font-size:15px;font-weight:700}
+.res-body{padding:24px}
+.res-close{background:none;border:1px solid rgba(255,255,255,.4);color:white;padding:5px 12px;border-radius:5px;cursor:pointer;font-size:12px}
+.res-print{background:var(--blue);border:none;color:white;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+.rs{margin-bottom:20px}
+.rs h3{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid var(--lb)}
+.rt{width:100%;border-collapse:collapse;font-size:12px}
+.rt th{background:#F0F4F8;color:var(--muted);font-size:11px;padding:7px 10px;text-align:left;font-weight:600}
+.rt td{padding:7px 10px;border-bottom:1px solid #F5F5F5;vertical-align:top}
+.rt tr:last-child td{border-bottom:none}
+.rg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.rf{font-size:12px}
+.rf strong{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px}
+.sb{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700}
+.sb-ok{background:var(--lg);color:var(--green)}
+.sb-falla{background:var(--lr);color:var(--red)}
+.sb-mant{background:var(--la);color:var(--amber)}
+.sb-pres{background:var(--lg);color:var(--green)}
+.sb-aus{background:var(--lr);color:var(--red)}
+.sb-lic{background:var(--lb);color:var(--navy)}
+.sb-si{background:var(--lg);color:var(--green)}
+.sb-no{background:var(--lr);color:var(--red)}
+.firmas-g{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:8px}
+.firma-box{text-align:center;padding-top:50px;border-top:1px solid var(--text);font-size:11px;color:var(--muted)}
+.res-note{font-size:10px;color:var(--muted);text-align:center;margin-top:16px;padding-top:12px;border-top:1px solid var(--border)}
+@media print{
+  body{background:white}
+  .app-header,.progress-bar,.footer-nav,.toast,.res-close,.res-print{display:none!important}
+  #res-modal{display:block!important;position:static;background:none;padding:0}
+  .res-inner{box-shadow:none;border-radius:0}
+  .res-hdr{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .main,.step{display:none!important}
+}
+</style>
+</head>
+<body>
+
+<datalist id="pers-list">
+  <option value="Leontina Ríos">
+  <option value="Lila Sepúlveda">
+  <option value="Fernanda Sánchez">
+  <option value="Paula Parada">
+  <option value="Denis Lazcano">
+  <option value="Felipe Fernández">
+  <option value="Andrés Faúndez">
+  <option value="Maritza Rivera">
+  <option value="Juan Rivas">
+  <option value="Fabián Sepúlveda">
+  <option value="Yeremi Ancavil">
+  <option value="Aracely Núñez">
+  <option value="Francisca Millamán">
+  <option value="Liliana Soto">
+  <option value="Natalia Mendoza">
+  <option value="Tamara Muñoz">
+  <option value="Carlos González">
+  <option value="Carolina Villagrá">
+  <option value="Yerko Concha">
+  <option value="Liliana Cheuquefilo">
+  <option value="Verónica Escudero">
+  <option value="Noemí Navarro">
+  <option value="Ángela Núñez">
+  <option value="Nicolás Olivo">
+  <option value="Brian Puente">
+  <option value="Paulo Salinas">
+  <option value="Claudio Puebla">
+  <option value="Víctor Arzola">
+</datalist>
+<div class="app-header">
+  <div>
+    <h1><i class="fa-solid fa-arrow-right-arrow-left"></i> Entrega de Turno</h1>
+    <p>EsterilMed SpA · Formulario de traspaso entre supervisoras</p>
+  </div>
+  <span class="chip" id="chip-fecha"></span>
+</div>
+
+<div class="progress-bar">
+  <div class="p-step"><div class="p-dot active" id="pd1">1</div><span class="p-label" style="color:var(--navy);font-weight:600">Datos turno</span></div>
+  <div class="p-line" id="pl1"></div>
+  <div class="p-step"><div class="p-dot" id="pd2">2</div><span class="p-label">Equipos</span></div>
+  <div class="p-line" id="pl2"></div>
+  <div class="p-step"><div class="p-dot" id="pd3">3</div><span class="p-label">Cargas</span></div>
+  <div class="p-line" id="pl3"></div>
+  <div class="p-step"><div class="p-dot" id="pd4">4</div><span class="p-label">Personal</span></div>
+  <div class="p-line" id="pl4"></div>
+  <div class="p-step"><div class="p-dot" id="pd5">5</div><span class="p-label">Cierre</span></div>
+</div>
+
+<div class="main">
+
+<div class="step active" id="step1">
+  <div class="section">
+    <div class="stitle"><i class="fa-solid fa-id-card"></i> Identificación del turno</div>
+    <div class="g2">
+      <div class="field"><label>Supervisora que entrega</label>
+        <select id="sup-entrega">
+          <option value="">Seleccionar...</option>
+          <option>Leontina Ríos</option><option>Lila Sepúlveda</option><option>Fernanda Sánchez</option><option>Paula Parada</option>
+        </select>
+      </div>
+      <div class="field"><label>Supervisora que recibe</label>
+        <select id="sup-recibe">
+          <option value="">Seleccionar...</option>
+          <option>Leontina Ríos</option><option>Lila Sepúlveda</option><option>Fernanda Sánchez</option><option>Paula Parada</option>
+        </select>
+      </div>
+      <div class="field"><label>Turno que entrega</label>
+        <select id="turno-entrega"><option value="Turno día">Turno día</option><option value="Turno noche">Turno noche</option></select>
+      </div>
+      <div class="field"><label>Fecha y hora</label><input type="datetime-local" id="fecha-hora"></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="stitle"><i class="fa-solid fa-triangle-exclamation"></i> Incidentes del turno</div>
+    <div id="inc-lista">
+      <div class="inc-row">
+        <div class="field"><label>N° folio</label><input type="text" placeholder="Ej: 6398"></div>
+        <div class="field"><label>Cliente</label><input type="text" placeholder="Ej: CAPREDENA"></div>
+        <div class="field"><label>Descripción</label><input type="text" placeholder="Tipo de incidente"></div>
+        <button class="btn-del" onclick="delInc(this)">×</button>
+      </div>
+    </div>
+    <button class="btn-add-row" onclick="addInc()"><i class="fa-solid fa-plus"></i> Agregar incidente</button>
+    <div class="field" style="margin-top:12px"><label>¿Turno sin incidentes?</label>
+      <select id="sin-inc"><option value="no">No (hay incidentes registrados)</option><option value="si">Sí — turno sin incidentes</option></select>
+    </div>
+  </div>
+  <div class="section">
+    <div class="stitle"><i class="fa-solid fa-list-check"></i> Pendientes para el siguiente turno</div>
+    <div class="field"><textarea id="pendientes" placeholder="Tareas pendientes, coordinaciones con clientes, instrucciones especiales..."></textarea></div>
+  </div>
+  <div class="section">
+    <div class="stitle"><i class="fa-solid fa-truck"></i> Rutas de clientes</div>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1.5fr auto;gap:8px;margin-bottom:6px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase">
+      <span>Cliente</span><span>Horario retiro</span><span>Horario entrega</span><span>Observaciones</span><span></span>
+    </div>
+    <div id="rutas-lista">
+      <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1.5fr auto;gap:8px;align-items:center;margin-bottom:8px">
+        <input type="text" placeholder="Nombre del cliente" style="font-size:12px;padding:6px 8px;border:1px solid var(--border);border-radius:5px">
+        <input type="time" style="font-size:12px;padding:6px 8px;border:1px solid var(--border);border-radius:5px">
+        <input type="time" style="font-size:12px;padding:6px 8px;border:1px solid var(--border);border-radius:5px">
+        <input type="text" placeholder="Obs." style="font-size:12px;padding:6px 8px;border:1px solid var(--border);border-radius:5px">
+        <button class="btn-del" onclick="this.closest('div').remove()">×</button>
+      </div>
+    </div>
+    <button class="btn-add-row" onclick="addRuta()"><i class="fa-solid fa-plus"></i> Agregar cliente</button>
+  </div>
+  <div class="section">
+    <div class="stitle"><i class="fa-solid fa-phone-volume"></i> Clientes de contingencia</div>
+    <div id="cont-lista">
+      <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px">
+        <div class="field"><label>Cliente</label><input type="text" placeholder="Nombre del cliente"></div>
+        <div class="field"><label>Situación / motivo</label><input type="text" placeholder="Descripción breve"></div>
+        <button class="btn-del" onclick="delCont(this)" style="margin-bottom:2px">×</button>
+      </div>
+    </div>
+    <button class="btn-add-row" onclick="addCont()"><i class="fa-solid fa-plus"></i> Agregar cliente de contingencia</button>
+  </div>
+  <div class="footer-nav">
+    <button class="btn-next" onclick="irPaso(2)">Equipos <i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+</div>
+
+<div class="step" id="step2">
+  <div class="section">
+    <div class="stitle"><i class="fa-solid fa-wave-square"></i> Equipos de esterilización</div>
+    <div class="eq-grid" id="eq-esterilizacion"></div>
+  </div>
+  <div class="section">
+    <div class="stitle"><i class="fa-solid fa-droplet"></i> Equipos área de descontaminación</div>
+    <div class="eq-grid" id="eq-descontaminacion"></div>
+    <div class="field" style="margin-top:14px;max-width:200px">
+      <label>Tapones disponibles (unidades)</label>
+      <input type="number" id="tapones" min="0" placeholder="Ej: 20">
+    </div>
+  </div>
+  <div class="footer-nav">
+    <button class="btn-back" onclick="irPaso(1)"><i class="fa-solid fa-arrow-left"></i> Volver</button>
+    <button class="btn-next" onclick="irPaso(3)">Cargas <i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+</div>
+
+<div class="step" id="step3">
+  <div class="section">
+    <div class="stitle"><i class="fa-solid fa-box"></i> Cargas y procesos en curso</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-bottom:6px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase">
+      <span>Equipo</span><span>N° carga / folio</span><span>Estado</span><span></span>
+    </div>
+    <div id="cargas-lista">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-bottom:8px">
+        <select style="font-size:12px;padding:6px 8px;border:1px solid var(--border);border-radius:5px"><option value="">Equipo...</option><option>Autoclave 1</option><option>Autoclave 2</option><option>Autoclave 3</option><option>Plasmas N°1</option><option>Plasmas N°2</option></select>
+        <input type="text" placeholder="Ciclo / Folio" style="font-size:12px;padding:6px 8px;border:1px solid var(--border);border-radius:5px">
+        <select style="font-size:12px;padding:6px 8px;border:1px solid var(--border);border-radius:5px"><option>En proceso</option><option>Completada OK</option><option>Retenida</option><option>Fallida</option></select>
+        <button class="btn-del" onclick="this.closest('div').remove()">×</button>
+      </div>
+    </div>
+    <button class="btn-add-row" onclick="addCarga()"><i class="fa-solid fa-plus"></i> Agregar carga</button>
+  </div>
+  <div class="section">
+    <div class="stitle"><i class="fa-solid fa-screwdriver-wrench"></i> Instrumental pendiente</div>
+    <div id="cnt-instrumental"></div>
+  </div>
+  <div class="section">
+    <div class="stitle"><i class="fa-solid fa-scissors"></i> Entrega de instrumental suelto</div>
+    <div id="cnt-suelto"></div>
+  </div>
+  <div class="footer-nav">
+    <button class="btn-back" onclick="irPaso(2)"><i class="fa-solid fa-arrow-left"></i> Volver</button>
+    <button class="btn-next" onclick="irPaso(4)">Personal <i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+</div>
+
+<div class="step" id="step4">
+  <div class="section">
+    <div class="stitle"><i class="fa-solid fa-users"></i> Novedades de personal</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px"><i class="fa-solid fa-circle-info"></i> Registrar solo funcionarios con ausencia, licencia u observación relevante del turno.</p>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1.5fr auto;gap:8px;margin-bottom:6px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase">
+      <span>Funcionario</span><span>Estado</span><span>Observación</span><span></span>
+    </div>
+    <div id="novedades-lista"></div>
+    <button class="btn-add-row" onclick="addNovedad()" style="margin-top:8px"><i class="fa-solid fa-user-plus"></i> Agregar novedad</button>
+  </div>
+  <div class="footer-nav">
+    <button class="btn-back" onclick="irPaso(3)"><i class="fa-solid fa-arrow-left"></i> Volver</button>
+    <button class="btn-next" onclick="irPaso(5)">Cierre <i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+</div>
+
+<div class="step" id="step5">
+  <div class="section">
+    <div class="stitle"><i class="fa-solid fa-mobile-screen"></i> Entrega de objetos de responsabilidad</div>
+    <div id="objetos-lista"></div>
+    <div class="field" style="margin-top:12px">
+      <label>Observaciones sobre objetos</label>
+      <input type="text" id="obs-objetos" placeholder="Ej: Celular con batería baja, cargador extraviado">
+    </div>
+  </div>
+  <div class="section">
+    <div class="stitle"><i class="fa-solid fa-note-sticky"></i> Observaciones generales del turno</div>
+    <div class="field"><textarea id="obs-generales" placeholder="Condiciones del turno, situaciones de personal, instrucciones de Dirección Técnica..." style="min-height:90px"></textarea></div>
+  </div>
+  <div class="section" style="background:#F8FAFF;border-color:var(--blue)">
+    <div class="stitle"><i class="fa-solid fa-pen-to-square"></i> Confirmación de entrega</div>
+    <div class="g2">
+      <div class="field"><label>Nombre — supervisora que entrega</label><input type="text" id="firma-entrega" placeholder="Escribir nombre completo"></div>
+      <div class="field"><label>Nombre — supervisora que recibe</label><input type="text" id="firma-recibe" placeholder="Escribir nombre completo"></div>
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin-top:10px"><i class="fa-solid fa-circle-info"></i> Al registrar, ambas supervisoras confirman haber realizado la entrega conforme al protocolo EsterilMed SpA.</p>
+  </div>
+  <div class="footer-nav">
+    <button class="btn-back" onclick="irPaso(4)"><i class="fa-solid fa-arrow-left"></i> Volver</button>
+    <button class="btn-preview" onclick="abrirResumen()"><i class="fa-solid fa-eye"></i> Vista previa</button>
+    <button class="btn-submit" onclick="registrar()"><i class="fa-solid fa-check"></i> Registrar entrega</button>
+  </div>
+</div>
+
+</div>
+
+<div id="res-modal">
+  <div class="res-inner">
+    <div class="res-hdr">
+      <div>
+        <h2><i class="fa-solid fa-file-lines"></i> Resumen entrega de turno</h2>
+        <p style="font-size:11px;opacity:.75;margin-top:2px">EsterilMed SpA · Registro oficial</p>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="res-print" onclick="window.print()"><i class="fa-solid fa-print"></i> Imprimir / PDF</button>
+        <button class="res-close" onclick="cerrarResumen()">✕ Cerrar</button>
+      </div>
+    </div>
+    <div class="res-body" id="res-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const PERSONAL_LIST=[
+  "Leontina Ríos","Lila Sepúlveda","Fernanda Sánchez","Paula Parada",
+  "Denis Lazcano","Felipe Fernández","Andrés Faúndez","Maritza Rivera",
+  "Juan Rivas","Fabián Sepúlveda","Yeremi Ancavil","Aracely Núñez",
+  "Francisca Millamán","Liliana Soto","Natalia Mendoza","Tamara Muñoz",
+  "Carlos González","Carolina Villagrá","Yerko Concha","Liliana Cheuquefilo",
+  "Verónica Escudero","Noemí Navarro","Ángela Núñez","Nicolás Olivo",
+  "Brian Puente","Paulo Salinas","Claudio Puebla","Víctor Arzola"
+];
+const EQ_EST=["Autoclave N°1","Autoclave N°2","Autoclave N°3","Plasmas N°1","Plasmas N°2","Lavadora ultrasónica","Lavadora de canastos"];
+const EQ_DESC=["Lavadora termodesinfectora","Vaporizadoras","Ultrasónicas","Secadoras"];
+const OBJETOS=["Celular supervisora","Cargador supervisora","Celular instrumentista","Cargador instrumentista"];
+const INST_PEND=["Cajas pendientes por lavar","Cajas pendientes por preparar","Cajas pendientes por esterilizar"];
+const INST_SUELTO=["Joyeros","Tijeras","Cestas","Aspiradoras"];
+let eqSt={},objSt={},persName={},persSt={},contadores={},paso=1;
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const now=new Date();
+  document.getElementById('fecha-hora').value=now.toISOString().slice(0,16);
+  document.getElementById('chip-fecha').textContent=now.toLocaleDateString('es-CL',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  renderEq('eq-esterilizacion',EQ_EST);
+  renderEq('eq-descontaminacion',EQ_DESC);
+  renderObjetos();
+  renderCnt('cnt-instrumental',INST_PEND);
+  renderCnt('cnt-suelto',INST_SUELTO);
+  renderPersonal();
+});
+
+function irPaso(n){
+  document.getElementById('step'+paso).classList.remove('active');
+  document.getElementById('step'+n).classList.add('active');
+  for(let i=1;i<=5;i++){
+    document.getElementById('pd'+i).className='p-dot'+(i===n?' active':i<n?' done':'');
+    if(i<5) document.getElementById('pl'+i).className='p-line'+(i<n?' done':'');
+  }
+  paso=n; window.scrollTo(0,0);
+}
+
+function renderEq(cid,lista){
+  const c=document.getElementById(cid); c.innerHTML='';
+  lista.forEach(n=>{
+    if(!eqSt[n]) eqSt[n]={e:'',obs:''};
+    const d=document.createElement('div'); d.className='eq-card';
+    d.innerHTML=`<div class="eq-name">${n}</div>
+      <div class="eq-btns">
+        <button class="eq-btn ${eqSt[n].e==='ok'?'ok':''}" onclick="setEq('${n}','ok',this)">✓ Operativo</button>
+        <button class="eq-btn ${eqSt[n].e==='falla'?'falla':''}" onclick="setEq('${n}','falla',this)">✗ Falla</button>
+        <button class="eq-btn ${eqSt[n].e==='mant'?'mant':''}" onclick="setEq('${n}','mant',this)">⚙ Mant.</button>
+      </div>
+      <input class="eq-obs" type="text" placeholder="Observación (opcional)" value="${eqSt[n].obs}"
+        oninput="eqSt['${n}'].obs=this.value">`;
+    c.appendChild(d);
+  });
+}
+function setEq(n,v,btn){
+  eqSt[n].e=v;
+  const btns=btn.closest('.eq-btns').querySelectorAll('.eq-btn');
+  btns.forEach((b,i)=>b.className='eq-btn'+([[' ok'],[' falla'],[' mant']][i][0]===(' '+v)?''+ [' ok',' falla',' mant'][i]:' '));
+  const map={ok:' ok',falla:' falla',mant:' mant'};
+  btns.forEach(b=>{const bv=b.onclick.toString().match(/'(\w+)'\)/);if(bv) b.className='eq-btn'+(bv[1]===v?map[v]:'')});
+  btn.className='eq-btn'+map[v];
+}
+
+function addInc(){
+  const l=document.getElementById('inc-lista');
+  const d=document.createElement('div'); d.className='inc-row';
+  d.innerHTML='<div class="field"><label>N° folio</label><input type="text" placeholder="Ej: 6398"></div><div class="field"><label>Cliente</label><input type="text" placeholder="Ej: CAPREDENA"></div><div class="field"><label>Descripción</label><input type="text" placeholder="Tipo de incidente"></div><button class="btn-del" onclick="delInc(this)">×</button>';
+  l.appendChild(d);
+}
+function delInc(btn){btn.closest('.inc-row').remove()}
+
+function addCarga(){
+  const l=document.getElementById('cargas-lista');
+  const d=document.createElement('div');
+  d.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-bottom:8px';
+  d.innerHTML='<select style="font-size:12px;padding:6px 8px;border:1px solid var(--border);border-radius:5px"><option value="">Equipo...</option><option>Autoclave 1</option><option>Autoclave 2</option><option>Autoclave 3</option><option>Plasmas N°1</option><option>Plasmas N°2</option></select><input type="text" placeholder="Ciclo / Folio" style="font-size:12px;padding:6px 8px;border:1px solid var(--border);border-radius:5px"><select style="font-size:12px;padding:6px 8px;border:1px solid var(--border);border-radius:5px"><option>En proceso</option><option>Completada OK</option><option>Retenida</option><option>Fallida</option></select><button class="btn-del" onclick="this.closest(\'div\').remove()">×</button>';
+  l.appendChild(d);
+}
+
+function renderCnt(cid,lista){
+  const c=document.getElementById(cid); c.innerHTML='';
+  lista.forEach(label=>{
+    if(!contadores[label]) contadores[label]={val:0,obs:''};
+    const r=document.createElement('div'); r.className='cnt-row';
+    const id='cnt_'+label.replace(/\s/g,'_').replace(/[^a-zA-Z0-9_]/g,'');
+    r.innerHTML=`<span class="cnt-label">${label}</span>
+      <div class="cnt-ctrl">
+        <button class="cnt-btn" onclick="camCnt('${label}',-1)">−</button>
+        <span class="cnt-val" id="${id}">${contadores[label].val}</span>
+        <button class="cnt-btn" onclick="camCnt('${label}',1)">+</button>
+      </div>
+      <input class="cnt-obs" type="text" placeholder="Obs." value="${contadores[label].obs}"
+        oninput="contadores['${label}'].obs=this.value">`;
+    c.appendChild(r);
+  });
+}
+function camCnt(label,delta){
+  contadores[label].val=Math.max(0,(contadores[label].val||0)+delta);
+  const id='cnt_'+label.replace(/\s/g,'_').replace(/[^a-zA-Z0-9_]/g,'');
+  const el=document.getElementById(id); if(el) el.textContent=contadores[label].val;
+}
+
+function renderObjetos(){
+  const c=document.getElementById('objetos-lista'); c.innerHTML='';
+  OBJETOS.forEach(n=>{
+    if(!objSt[n]) objSt[n]='si';
+    const r=document.createElement('div'); r.className='obj-row';
+    r.innerHTML=`<span class="obj-label">${n}</span>
+      <div class="obj-btns">
+        <button class="pill pres ${objSt[n]==='si'?'':'inactive'}" onclick="setObj('${n}','si')">✓ Entregado</button>
+        <button class="pill aus ${objSt[n]==='no'?'':'inactive'}" onclick="setObj('${n}','no')">✗ No entregado</button>
+      </div>`;
+    c.appendChild(r);
+  });
+}
+function setObj(n,v){objSt[n]=v; renderObjetos()}
+
+function renderPersonal(){}
+function addNovedad(){
+  const l=document.getElementById('novedades-lista');
+  const d=document.createElement('div');
+  d.style.cssText='display:grid;grid-template-columns:1.5fr 1fr 1.5fr auto;gap:8px;align-items:center;margin-bottom:8px';
+  const st='font-size:12px;padding:6px 8px;border:1px solid var(--border);border-radius:5px;font-family:inherit';
+  d.innerHTML=`<input type="text" list="pers-list" placeholder="Nombre funcionario" style="${st}">
+    <select style="${st}">
+      <option value="">Estado...</option>
+      <option>Ausente</option>
+      <option>Licencia médica</option>
+      <option>Permiso</option>
+      <option>Llegada tarde</option>
+      <option>Salida anticipada</option>
+      <option>Otra novedad</option>
+    </select>
+    <input type="text" placeholder="Observación" style="${st}">
+    <button class="btn-del" onclick="this.parentElement.remove()">×</button>`;
+  l.appendChild(d);
+}
+function getNovedades(){
+  const rows=document.querySelectorAll('#novedades-lista > div'); const nov=[];
+  rows.forEach(r=>{const inp=r.querySelectorAll('input'); const sel=r.querySelector('select');
+    if(inp[0]&&inp[0].value) nov.push({nombre:inp[0].value,estado:sel?sel.value:'',obs:inp[1]?inp[1].value:''})});
+  return nov;
+}
+
+function showToast(msg,dur=3000){
+  const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block';
+  setTimeout(()=>t.style.display='none',dur);
+}
+
+function getIncidentes(){
+  const rows=document.querySelectorAll('#inc-lista .inc-row'); const inc=[];
+  rows.forEach(r=>{const inp=r.querySelectorAll('input'); if(inp[0].value||inp[1].value||inp[2].value) inc.push({folio:inp[0].value,cliente:inp[1].value,desc:inp[2].value})});
+  return inc;
+}
+function getCargas(){
+  const rows=document.querySelectorAll('#cargas-lista > div'); const cargas=[];
+  rows.forEach(r=>{const sel=r.querySelectorAll('select'); const inp=r.querySelector('input'); if(sel[0]&&sel[0].value) cargas.push({eq:sel[0].value,carga:inp?inp.value:'',est:sel[1]?sel[1].value:''})});
+  return cargas;
+}
+
+function generarHTML(){
+  const se=document.getElementById('sup-entrega').value||'—';
+  const sr=document.getElementById('sup-recibe').value||'—';
+  const turno=document.getElementById('turno-entrega').value;
+  const fh=document.getElementById('fecha-hora').value;
+  const fecha=fh?new Date(fh).toLocaleString('es-CL'):'—';
+  const pend=document.getElementById('pendientes').value||'Sin pendientes.';
+  const sinI=document.getElementById('sin-inc').value==='si';
+  const obsObj=document.getElementById('obs-objetos').value;
+  const obsGen=document.getElementById('obs-generales').value;
+  const firmaE=document.getElementById('firma-entrega').value||'—';
+  const firmaR=document.getElementById('firma-recibe').value||'—';
+  const tap=document.getElementById('tapones').value||'—';
+  const inc=getIncidentes(); const cargas=getCargas();
+  const ahora=new Date().toLocaleString('es-CL');
+
+  const eqRows=(lista)=>lista.map(n=>{
+    const e=eqSt[n]||{e:'',obs:''};
+    const cls=e.e==='ok'?'sb-ok':e.e==='falla'?'sb-falla':e.e==='mant'?'sb-mant':'';
+    const lab=e.e==='ok'?'Operativo':e.e==='falla'?'Falla':e.e==='mant'?'Mantenimiento':'Sin registrar';
+    return`<tr><td>${n}</td><td><span class="sb ${cls}">${lab}</span></td><td style="color:var(--muted)">${e.obs||'—'}</td></tr>`;
+  }).join('');
+
+  const cntRows=(lista)=>lista.map(l=>{
+    const c=contadores[l]||{val:0,obs:''};
+    return`<tr><td>${l}</td><td style="font-weight:700;color:var(--navy);text-align:center">${c.val}</td><td style="color:var(--muted)">${c.obs||'—'}</td></tr>`;
+  }).join('');
+
+  const objRows=OBJETOS.map(n=>{
+    const v=objSt[n]||'si';
+    return`<tr><td>${n}</td><td><span class="sb ${v==='si'?'sb-si':'sb-no'}">${v==='si'?'Entregado':'No entregado'}</span></td></tr>`;
+  }).join('');
+
+
+
+  return`
+  <div class="rs"><h3>Datos del turno</h3>
+    <div class="rg">
+      <div class="rf"><strong>Supervisora que entrega</strong>${se}</div>
+      <div class="rf"><strong>Supervisora que recibe</strong>${sr}</div>
+      <div class="rf"><strong>Turno</strong>${turno}</div>
+      <div class="rf"><strong>Fecha y hora</strong>${fecha}</div>
+    </div>
+  </div>
+  <div class="rs"><h3>Incidentes del turno</h3>
+    ${sinI||!inc.length
+      ?'<p style="font-size:12px;color:var(--green);font-weight:600">✓ Turno sin incidentes registrados</p>'
+      :`<table class="rt"><thead><tr><th>N° folio</th><th>Cliente</th><th>Descripción</th></tr></thead><tbody>${inc.map(i=>`<tr><td>${i.folio||'—'}</td><td>${i.cliente||'—'}</td><td>${i.desc||'—'}</td></tr>`).join('')}</tbody></table>`}
+  </div>
+  ${(()=>{const r=getRutas();return r.length?`<div class="rs"><h3>Rutas de clientes</h3><table class="rt"><thead><tr><th>Cliente</th><th>Horario retiro</th><th>Horario entrega</th><th>Observaciones</th></tr></thead><tbody>${r.map(x=>`<tr><td>${x.cliente}</td><td>${x.retiro||'—'}</td><td>${x.entrega||'—'}</td><td>${x.obs||'—'}</td></tr>`).join('')}</tbody></table></div>`:'';})()}
+  ${(()=>{const c=getContingencias();return c.length?`<div class="rs"><h3>Clientes de contingencia</h3><table class="rt"><thead><tr><th>Cliente</th><th>Situación / motivo</th></tr></thead><tbody>${c.map(x=>`<tr><td>${x.cliente}</td><td>${x.motivo||'—'}</td></tr>`).join('')}</tbody></table></div>`:'';})()}
+  <div class="rs"><h3>Pendientes para el siguiente turno</h3>
+    <p style="font-size:12px;white-space:pre-wrap;line-height:1.6">${pend}</p>
+  </div>
+  <div class="rs"><h3>Estado de equipos de esterilización</h3>
+    <table class="rt"><thead><tr><th>Equipo</th><th>Estado</th><th>Observación</th></tr></thead><tbody>${eqRows(EQ_EST)}</tbody></table>
+  </div>
+  <div class="rs"><h3>Estado de equipos de descontaminación</h3>
+    <table class="rt"><thead><tr><th>Equipo</th><th>Estado</th><th>Observación</th></tr></thead><tbody>${eqRows(EQ_DESC)}</tbody></table>
+    <p style="font-size:12px;margin-top:8px"><strong>Tapones disponibles:</strong> ${tap} unidades</p>
+  </div>
+  <div class="rs"><h3>Cargas y procesos en curso</h3>
+    ${!cargas.length?'<p style="font-size:12px;color:var(--muted)">Sin cargas registradas.</p>'
+    :`<table class="rt"><thead><tr><th>Equipo</th><th>Carga / folio</th><th>Estado</th></tr></thead><tbody>${cargas.map(c=>`<tr><td>${c.eq}</td><td>${c.carga||'—'}</td><td>${c.est}</td></tr>`).join('')}</tbody></table>`}
+  </div>
+  <div class="rs"><h3>Instrumental pendiente y suelto</h3>
+    <table class="rt"><thead><tr><th>Ítem</th><th style="text-align:center">Cantidad</th><th>Observación</th></tr></thead><tbody>${cntRows([...INST_PEND,...INST_SUELTO])}</tbody></table>
+  </div>
+  <div class="rs"><h3>Objetos de responsabilidad</h3>
+    <table class="rt"><thead><tr><th>Objeto</th><th>Estado</th></tr></thead><tbody>${objRows}</tbody></table>
+    ${obsObj?`<p style="font-size:12px;margin-top:8px;color:var(--muted)"><strong>Obs.:</strong> ${obsObj}</p>`:''}
+  </div>
+  ${(()=>{const nov=getNovedades();return nov.length?`<div class="rs"><h3>Novedades de personal</h3><table class="rt"><thead><tr><th>Funcionario</th><th>Estado</th><th>Observación</th></tr></thead><tbody>${nov.map(x=>`<tr><td>${x.nombre}</td><td>${x.estado||'—'}</td><td>${x.obs||'—'}</td></tr>`).join('')}</tbody></table></div>`:'<div class="rs"><h3>Novedades de personal</h3><p style="font-size:12px;color:var(--green);font-weight:600">✓ Sin novedades de personal en este turno</p></div>';})()}
+  ${obsGen?`<div class="rs"><h3>Observaciones generales</h3><p style="font-size:12px;white-space:pre-wrap;line-height:1.6">${obsGen}</p></div>`:''}
+  <div class="rs"><h3>Firmas de conformidad</h3>
+    <div class="firmas-g">
+      <div class="firma-box"><strong style="font-size:13px">${firmaE}</strong><br>Supervisora · Turno saliente<br>EsterilMed SpA</div>
+      <div class="firma-box"><strong style="font-size:13px">${firmaR}</strong><br>Supervisora · Turno entrante<br>EsterilMed SpA</div>
+    </div>
+  </div>
+  <div class="res-note">Documento generado el ${ahora} · Sistema de Entrega de Turno EsterilMed SpA<br>Creado por Marjorie Miranda Gatica, Enf. · Directora Técnica · EsterilMed SpA</div>`;
+}
+
+function abrirResumen(){
+  document.getElementById('res-body').innerHTML=generarHTML();
+  document.getElementById('res-modal').style.display='block';
+  document.body.style.overflow='hidden';
+}
+function cerrarResumen(){
+  document.getElementById('res-modal').style.display='none';
+  document.body.style.overflow='';
+}
+
+function addRuta(){
+  const l=document.getElementById('rutas-lista');
+  const d=document.createElement('div');
+  d.style.cssText='display:grid;grid-template-columns:1.5fr 1fr 1fr 1.5fr auto;gap:8px;align-items:center;margin-bottom:8px';
+  const st='font-size:12px;padding:6px 8px;border:1px solid var(--border);border-radius:5px';
+  d.innerHTML=`<input type="text" placeholder="Nombre del cliente" style="${st}"><input type="time" style="${st}"><input type="time" style="${st}"><input type="text" placeholder="Obs." style="${st}"><button class="btn-del" onclick="this.parentElement.remove()">×</button>`;
+  l.appendChild(d);
+}
+function getRutas(){
+  const rows=document.querySelectorAll('#rutas-lista > div'); const rutas=[];
+  rows.forEach(r=>{const inp=r.querySelectorAll('input'); if(inp[0]&&inp[0].value) rutas.push({cliente:inp[0].value,retiro:inp[1]?inp[1].value:'',entrega:inp[2]?inp[2].value:'',obs:inp[3]?inp[3].value:''})});
+  return rutas;
+}
+
+function addCont(){
+  const l=document.getElementById('cont-lista');
+  const d=document.createElement('div');
+  d.style.cssText='display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px';
+  d.innerHTML='<div class="field"><label>Cliente</label><input type="text" placeholder="Nombre del cliente"></div><div class="field"><label>Situación / motivo</label><input type="text" placeholder="Descripción breve"></div><button class="btn-del" onclick="this.parentElement.remove()" style="margin-bottom:2px">×</button>';
+  l.appendChild(d);
+}
+function delCont(btn){btn.parentElement.remove()}
+function getContingencias(){
+  const rows=document.querySelectorAll('#cont-lista > div'); const cont=[];
+  rows.forEach(r=>{const inp=r.querySelectorAll('input'); if(inp[0]&&inp[0].value) cont.push({cliente:inp[0].value,motivo:inp[1]?inp[1].value:''})});
+  return cont;
+}
+
+function registrar(){
+  const se=document.getElementById('sup-entrega').value;
+  const sr=document.getElementById('sup-recibe').value;
+  if(!se||!sr){showToast('⚠ Debes seleccionar ambas supervisoras'); return}
+  const fe=document.getElementById('firma-entrega').value;
+  const fr=document.getElementById('firma-recibe').value;
+  if(!fe||!fr){showToast('⚠ Completar los nombres de confirmación'); return}
+  abrirResumen();
+  setTimeout(()=>showToast('✓ Entrega de turno registrada correctamente'),300);
+}
+</script>
+</body>
+</html>
