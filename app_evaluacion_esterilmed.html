@@ -651,7 +651,7 @@ function goHome() { buildGrid(); show('s-home'); }
 // ── GOOGLE SHEETS ──
 function sendToSheets(usuario, modId, modTitle, score, version) {
   const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxws34d10nfO9oc8Q1SRddabjbtcIitPq2rUDXN-m3CUPSFDbYURw8sSDjWQTTFj2t3eA/exec';
-  const payload = {
+  const params = new URLSearchParams({
     nombre: usuario,
     area: modId,
     turno: 'Día',
@@ -659,11 +659,9 @@ function sendToSheets(usuario, modId, modTitle, score, version) {
     puntaje: score,
     fecha: new Date().toLocaleDateString('es-CL'),
     hora: new Date().toLocaleTimeString('es-CL', {hour:'2-digit',minute:'2-digit'})
-  };
-  fetch(SHEET_URL, {
-    method:'POST', mode:'no-cors',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify(payload)
+  });
+  fetch(SHEET_URL + '?' + params.toString(), {
+    method:'GET', mode:'no-cors'
   }).catch(()=>{});
 }
 
