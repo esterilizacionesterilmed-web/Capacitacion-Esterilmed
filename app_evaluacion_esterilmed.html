@@ -650,7 +650,7 @@ function goHome() { buildGrid(); show('s-home'); }
 
 // ── GOOGLE SHEETS ──
 function sendToSheets(usuario, modId, modTitle, score, version) {
-  const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxws34d10nfO9oc8Q1SRddabjbtcIitPq2rUDXN-m3CUPSFDbYURw8sSDjWQTTFj2t3eA/exec';
+  const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxlhyNmj_qBABJUZCr3xuXeY7AWoPN5JVgr3uvNsy0uThICr_wCLsTD5DxC7tKeIjA/exec';
   const params = new URLSearchParams({
     nombre: usuario,
     area: modId,
@@ -660,9 +660,8 @@ function sendToSheets(usuario, modId, modTitle, score, version) {
     fecha: new Date().toLocaleDateString('es-CL'),
     hora: new Date().toLocaleTimeString('es-CL', {hour:'2-digit',minute:'2-digit'})
   });
-  fetch(SHEET_URL + '?' + params.toString(), {
-    method:'GET', mode:'no-cors'
-  }).catch(()=>{});
+  const img = new Image();
+  img.src = SHEET_URL + '?' + params.toString();
 }
 
 function show(id) {
